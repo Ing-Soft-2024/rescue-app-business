@@ -5,7 +5,16 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
+      "@/src/*": [
+        "./src/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/context/*": [
+        "./src/context/*"
+      ],
     }
   },
   "include": [
