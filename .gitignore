@@ -25,3 +25,9 @@ web-build/
 
 expo-env.d.ts
 # @end expo-cli
+
+# Android - Google Services
+google-services.json*
+
+# iOS - Google Services
+GoogleService-Info.plist*
