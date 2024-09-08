@@ -4,10 +4,10 @@ import { Redirect, Stack, useRouter } from "expo-router";
 import { Pressable } from "react-native";
 
 export default function AppLayout() {
-    const { loggedIn } = useSession();
+    const { session } = useSession();
     const router = useRouter();
 
-    if (!loggedIn) return <Redirect href={"/signin"} />;
+    if (!session) return <Redirect href={"/signin"} />;
 
     return (
         <Stack

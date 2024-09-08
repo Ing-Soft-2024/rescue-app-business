@@ -1,5 +1,6 @@
 import { authMethods, isValidAuthMethod } from "@/auth/index";
 import { Session, SessionContextType } from "@/src/types/session.type";
+import * as SecureStoreOptions from "expo-secure-store";
 import React from "react";
 
 const SessionContext = React.createContext<SessionContextType | undefined>(undefined);
@@ -12,27 +13,62 @@ export const useSession = () => {
 }
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
-    const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
-    const [session, setSession] = React.useState<Session>({});
+    const [session, setSession] = React.useState<Session>();
+
+    // Load session from secure store
+    const getSessionFromSecureStore = async () => {
+        const session = await SecureStoreOptions.getItemAsync("session");
+        if (!session) return undefined;
+        return JSON.parse(session);
+    }
+
+    const refreshSession = (session?: Session) => {
+        if (!session || session.expiresAt > Date.now()) return;
+
+        authMethods[session.method].refreshSession(session)
+            .then(setSession)
+            .catch(console.error);
+    }
+
+    React.useEffect(() => {
+        getSessionFromSecureStore().then(setSession);
+
+        const interval = setInterval(() => refreshSession(session), 1000 * 60);
+        return () => {
+            clearInterval(interval);
+        }
+    }, []);
 
     return (
         <SessionContext.Provider value={{
-            loggedIn,
             session,
             signInWith: async (method, opt?) => {
                 if (!isValidAuthMethod(method)) throw Error("Invalid sign in method");
 
                 authMethods[method].signIn(opt)
                     .then((session) => {
-                        setLoggedIn(true);
                         setSession(session);
+
+                        // Save session to secure store, persisting the session
+                        SecureStoreOptions
+                            .setItem("session", JSON.stringify(session));
                     })
                     .catch((error) => {
                         console.error(error);
                     });
             },
             signOut: () => {
-
+                if (!session) return;
+                authMethods[session.method].signOut()
+                    .then(() => {
+                        setSession(undefined);
+                        // Remove session from secure store
+                        SecureStoreOptions
+                            .deleteItemAsync("session");
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
             },
         }} >
             {children}

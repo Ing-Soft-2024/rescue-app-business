@@ -13,11 +13,16 @@ export class CredentialsAuth {
         const { data, error } = CredentialsAuthSchema.safeParse(props);
         if (error) throw Error("Invalid credentials");
 
-
-        return {};
+        console.log("Sign in with credentials");
+        return {} as Session;
     }
 
     static async signOut(): Promise<void> {
         console.log("Sign out with credentials");
+    }
+
+    static async refreshSession(session: Session): Promise<Session> {
+        console.log("Refresh session with credentials");
+        return { ...session } as Session;
     }
 }
