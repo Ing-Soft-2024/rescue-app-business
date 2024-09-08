@@ -30,7 +30,7 @@ class ApiConsumerFactory<ValidMethods extends string> {
     _axios: Axios;
     _endpoint: string;
     _validEndpoints?: ValidMethods[];
-    static baseURL = process.env['NEXT_PUBLIC_API_URL'];
+    static baseURL = process.env['REACT_PUBLIC_API_URL'];
 
     constructor({ endpoint, validEndpoints }: {
         endpoint: string,
@@ -105,9 +105,6 @@ export const apiConsumerFactory = ({
     endpoint,
     validEndpoints
 }: {
-    baseURL?: string,
     endpoint: string,
     validEndpoints?: string[]
-}) => {
-    return new ApiConsumerFactory({ endpoint, validEndpoints });
-}
+}) => new ApiConsumerFactory({ endpoint, validEndpoints });

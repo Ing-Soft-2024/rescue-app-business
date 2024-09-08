@@ -15,6 +15,9 @@
       "@/context/*": [
         "./src/context/*"
       ],
+      "@/auth/*": [
+        "./src/services/auth/*"
+      ],
     }
   },
   "include": [

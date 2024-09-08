@@ -1,5 +1,6 @@
+import { authMethods, isValidAuthMethod } from "@/auth/index";
+import { Session, SessionContextType } from "@/src/types/session.type";
 import React from "react";
-import { Session, SessionContextType } from "../types/session.type";
 
 const SessionContext = React.createContext<SessionContextType | undefined>(undefined);
 export const useSession = () => {
@@ -11,19 +12,27 @@ export const useSession = () => {
 }
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
-    const [loggedIn, setLoggedIn] = React.useState<boolean>(true);
+    const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
     const [session, setSession] = React.useState<Session>({});
 
     return (
         <SessionContext.Provider value={{
             loggedIn,
             session,
-            loginWith: (method) => {
-                console.log(method);
-                return () => { };
+            signInWith: async (method, opt?) => {
+                if (!isValidAuthMethod(method)) throw Error("Invalid sign in method");
+
+                authMethods[method].signIn(opt)
+                    .then((session) => {
+                        setLoggedIn(true);
+                        setSession(session);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
             },
-            logout: () => {
-                return () => { };
+            signOut: () => {
+
             },
         }} >
             {children}

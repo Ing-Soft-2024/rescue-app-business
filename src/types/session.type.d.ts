@@ -1,18 +1,20 @@
-export enum SignInMethods {
-    GoogleSignIn,
-    FacebookSignIn,
-    AppleSignIn,
-    Credentials,
-}
+import { AuthMethods } from "../services/auth";
 
 export type Session = {
 
 }
 
+type SignInWithCredentials = (method: "Credentials", opts: { email: string, password: string }) => Promise<void>;
+type SignInWithSSO = (method: Exclude<AuthMethods, "Credentials">) => Promise<void>;
+
+type SignInWithType =
+    SignInWithSSO
+    & SignInWithCredentials;
+
 export type SessionContextType = {
     loggedIn: boolean;
     session: Session;
 
-    loginWith: (method: SignInMethods) => Function;
-    logout: () => Function;
+    signInWith: SignInWithType;
+    signOut: () => void;
 }
