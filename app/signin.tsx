@@ -6,13 +6,6 @@ export default function SignInPage() {
         signInWith
     } = useSession();
 
-    const signInWithCredentials = () => signInWith("Credentials", {
-        email: "",
-        password: ""
-    });
-
-    const signInWithSSO = () => signInWith("Google");
-
     return (
         <KeyboardAvoidingView style={{
             flex: 1,
@@ -23,7 +16,7 @@ export default function SignInPage() {
             <Button
                 color={"#000"}
                 title="Omitir"
-                onPress={() => { }}
+                onPress={() => signInWith("Guest")}
             />
         </KeyboardAvoidingView>
     )

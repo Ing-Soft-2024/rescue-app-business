@@ -4,7 +4,7 @@ import { Redirect, Stack, useRouter } from "expo-router";
 import { Pressable } from "react-native";
 
 export default function AppLayout() {
-    const { session } = useSession();
+    const { session, signOut } = useSession();
     const router = useRouter();
 
     if (!session) return <Redirect href={"/signin"} />;
@@ -13,6 +13,12 @@ export default function AppLayout() {
         <Stack
             screenOptions={{
                 headerBackTitleVisible: false,
+                // headerLeft: ({ canGoBack }) => !canGoBack && (
+                //     <Button
+                //         title="Cerrar sesión"
+                //         onPress={signOut}
+                //     />
+                // ),
                 headerRight: () => (
                     <Pressable
                         style={({ pressed }) => ({

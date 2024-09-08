@@ -1,5 +1,6 @@
 import { authMethods, isValidAuthMethod } from "@/auth/index";
 import { Session, SessionContextType } from "@/src/types/session.type";
+import { useRouter } from "expo-router";
 import * as SecureStoreOptions from "expo-secure-store";
 import React from "react";
 
@@ -13,6 +14,8 @@ export const useSession = () => {
 }
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
+    const router = useRouter();
+
     const [session, setSession] = React.useState<Session>();
 
     // Load session from secure store
@@ -39,6 +42,10 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         }
     }, []);
 
+    React.useEffect(() => {
+        router.replace("/(app)/");
+    }, [session])
+
     return (
         <SessionContext.Provider value={{
             session,
@@ -59,9 +66,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             },
             signOut: () => {
                 if (!session) return;
+                if (!isValidAuthMethod(session.method)) throw Error("Invalid sign out method");
                 authMethods[session.method].signOut()
                     .then(() => {
                         setSession(undefined);
+
                         // Remove session from secure store
                         SecureStoreOptions
                             .deleteItemAsync("session");
