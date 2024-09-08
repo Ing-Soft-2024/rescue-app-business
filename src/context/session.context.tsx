@@ -1,8 +1,8 @@
 import React from "react";
-import { SessionType } from "../types/session.type";
+import { Session, SessionContextType } from "../types/session.type";
 
-const SessionContext = React.createContext<SessionType | undefined>(undefined);
-const useSession = () => {
+const SessionContext = React.createContext<SessionContextType | undefined>(undefined);
+export const useSession = () => {
     const context = React.useContext(SessionContext);
     if (context === undefined) {
         throw new Error("useSession must be used within a SessionProvider");
@@ -11,10 +11,21 @@ const useSession = () => {
 }
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
-    const [session, setSession] = React.useState<SessionType>({});
+    const [loggedIn, setLoggedIn] = React.useState<boolean>(true);
+    const [session, setSession] = React.useState<Session>({});
 
     return (
-        <SessionContext.Provider value={session} >
+        <SessionContext.Provider value={{
+            loggedIn,
+            session,
+            loginWith: (method) => {
+                console.log(method);
+                return () => { };
+            },
+            logout: () => {
+                return () => { };
+            },
+        }} >
             {children}
         </SessionContext.Provider>
     );
