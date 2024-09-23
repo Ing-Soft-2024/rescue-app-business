@@ -1,7 +1,9 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { Image, KeyboardAvoidingView, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, KeyboardAvoidingView, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
+import ImageModal from "@/src/components/images/imageModal";
+
 
 
 const LabeledInput = ({ label, children, ...props }: {
@@ -45,11 +47,15 @@ export default function ProductPage() {
 
 
     return (
+
+        
+        
         <KeyboardAvoidingView style={{
             padding: 5,
             flex: 1,
             gap: 10
         }}>
+            <ImageModal></ImageModal>
             <LabeledInput label="Nombre">
                 <TextInput style={styles.input} placeholder="Nombre" />
             </LabeledInput>
@@ -77,8 +83,9 @@ export default function ProductPage() {
             <View style={{
                 gap: 10
             }}>
+                 
                 <Pressable
-                onPress={openImage}
+                    onPress={openImage}
                     style={({ pressed }) => ({
                         backgroundColor: pressed ? "#333" : "#000",
                         padding: 14,
