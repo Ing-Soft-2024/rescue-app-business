@@ -1,9 +1,9 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { Image, KeyboardAvoidingView, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import React, { useState } from "react";
+import ImageModalProps from "@/src/components/images/imageModal";
 import ImageModal from "@/src/components/images/imageModal";
-
 
 
 const LabeledInput = ({ label, children, ...props }: {
@@ -20,31 +20,11 @@ const LabeledInput = ({ label, children, ...props }: {
 
 
 export default function ProductPage() {
-    const [image, setImage] = useState<string | null>();
+     const [image, setImage] = useState<string | null>();
 
-
-    const openImage = async () => {
-        try {
-            await ImagePicker.requestCameraPermissionsAsync();
-            let result = await ImagePicker.launchCameraAsync({
-                cameraType: ImagePicker.CameraType.back,
-                allowsEditing: true,
-                aspect: [1,1],
-                quality: 1,
-            });
-            if(!result.canceled)
-                {
-                    saveImage(result.assets[0].uri);
-                }
-        } catch (error){
-            console.error("Error opening image: ", error);
-        }
+    const handleImageSelect = (imageUri: string) => {
+        setImage(imageUri); // Update the state with the selected image URI
     };
-
-    const saveImage = async (imageUri: string) => {
-       setImage(imageUri)
-    };
-
 
     return (
 
@@ -55,7 +35,7 @@ export default function ProductPage() {
             flex: 1,
             gap: 10
         }}>
-            <ImageModal></ImageModal>
+        
             <LabeledInput label="Nombre">
                 <TextInput style={styles.input} placeholder="Nombre" />
             </LabeledInput>
@@ -84,22 +64,15 @@ export default function ProductPage() {
                 gap: 10
             }}>
                  
-                <Pressable
-                    onPress={openImage}
-                    style={({ pressed }) => ({
-                        backgroundColor: pressed ? "#333" : "#000",
-                        padding: 14,
-                        borderRadius: 5,
-                        alignItems: "center"
-                    })}
-                >
-                    <Text style={{ color: "white", fontSize: 16 }}>Imagen</Text>
-                </Pressable>
 
 
                 {/* <Image source={image ? {image} : uri: "https://tr.rbxcdn.com/97406b6891c98069d3dd80e7be2dd8f0/420/420/Image/Png"}
                 style = {styles.image}
                 /> */}
+                <SafeAreaView>
+                {/*<ImageModalProps onImageSelect={handleImageSelect}></ImageModalProps>*/}
+                <ImageModal onImageSelect={handleImageSelect}></ImageModal>
+                </SafeAreaView>
             {image && (
                     <Image
                         source={{ uri: image }}
