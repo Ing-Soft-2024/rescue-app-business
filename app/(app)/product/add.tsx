@@ -1,5 +1,8 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { KeyboardAvoidingView, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, KeyboardAvoidingView, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { useState } from "react";
+
 
 const LabeledInput = ({ label, children, ...props }: {
     label: string;
@@ -12,7 +15,35 @@ const LabeledInput = ({ label, children, ...props }: {
     </View>
 )
 
+
+
 export default function ProductPage() {
+    const [image, setImage] = useState<string | null>();
+
+
+    const openImage = async () => {
+        try {
+            await ImagePicker.requestCameraPermissionsAsync();
+            let result = await ImagePicker.launchCameraAsync({
+                cameraType: ImagePicker.CameraType.back,
+                allowsEditing: true,
+                aspect: [1,1],
+                quality: 1,
+            });
+            if(!result.canceled)
+                {
+                    saveImage(result.assets[0].uri);
+                }
+        } catch (error){
+            console.error("Error opening image: ", error);
+        }
+    };
+
+    const saveImage = async (imageUri: string) => {
+       setImage(imageUri)
+    };
+
+
     return (
         <KeyboardAvoidingView style={{
             padding: 5,
@@ -46,6 +77,31 @@ export default function ProductPage() {
             <View style={{
                 gap: 10
             }}>
+                <Pressable
+                onPress={openImage}
+                    style={({ pressed }) => ({
+                        backgroundColor: pressed ? "#333" : "#000",
+                        padding: 14,
+                        borderRadius: 5,
+                        alignItems: "center"
+                    })}
+                >
+                    <Text style={{ color: "white", fontSize: 16 }}>Imagen</Text>
+                </Pressable>
+
+
+                {/* <Image source={image ? {image} : uri: "https://tr.rbxcdn.com/97406b6891c98069d3dd80e7be2dd8f0/420/420/Image/Png"}
+                style = {styles.image}
+                /> */}
+            {image && (
+                    <Image
+                        source={{ uri: image }}
+                        style={styles.image}
+                    />
+                )}
+                
+
+
                 <Pressable
                     style={({ pressed }) => ({
                         backgroundColor: pressed ? "#333" : "#000",
@@ -84,5 +140,12 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: "bold"
+    },
+
+    image:
+    {
+        width: 200,
+    height: 200,
+    marginTop: 20,
     }
 });
