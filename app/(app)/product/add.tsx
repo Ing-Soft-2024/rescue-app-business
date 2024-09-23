@@ -69,10 +69,10 @@ export default function ProductPage() {
                 {/* <Image source={image ? {image} : uri: "https://tr.rbxcdn.com/97406b6891c98069d3dd80e7be2dd8f0/420/420/Image/Png"}
                 style = {styles.image}
                 /> */}
-                <SafeAreaView>
-                {/*<ImageModalProps onImageSelect={handleImageSelect}></ImageModalProps>*/}
-                <ImageModal onImageSelect={handleImageSelect}></ImageModal>
-                </SafeAreaView>
+                
+            <ImageModalProps onImageSelect={handleImageSelect}></ImageModalProps>
+           
+                
             {image && (
                     <Image
                         source={{ uri: image }}

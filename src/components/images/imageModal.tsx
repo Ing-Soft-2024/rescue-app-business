@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, Button, StyleSheet } from 'react-native';
+import { Modal, View, Text, Button, StyleSheet, Pressable } from 'react-native';
 import * as ImagePicker from "expo-image-picker";
 
 
@@ -41,6 +41,7 @@ const ImageModal: React.FC<ImageModalProps> = ({onImageSelect}) => {
     } catch (error) {
         console.error(`Error opening ${type}: `, error);
     }
+    closeModal();
 };
 
   
@@ -64,19 +65,34 @@ const ImageModal: React.FC<ImageModalProps> = ({onImageSelect}) => {
     };
   
     return (
-      <View style={styles.container}>
-        <Button title="Image" onPress={openModal} />
+      <View>
+        
+        <Pressable
+        onPress={openModal}
+        style={({ pressed }) => ({
+          backgroundColor: pressed ? "#F69792" : "#F04A41",
+          padding: 14,
+          borderRadius: 5,
+          alignItems: "center"
+      })}
+        >
+                    <Text style={{ color: "white", fontSize: 16 }}>Imagen</Text>
+                </Pressable>
+
+
         <Modal
+          animationType="slide"
+          transparent={true}
           visible={modalVisible}
           onRequestClose={closeModal}
 
         >
           <View style={styles.overlay}>
-            <View style={styles.modalContent}>
+            <View style={styles.container}>
               <Text style={styles.modalText}>This is an overlay!</Text>
               <Button title="Close Overlay" onPress={closeModal} />
               <Button title="Camera" onPress={openCamera} />
-              <Button title="Camera" onPress={openGallery} />
+              <Button title="Galeria" onPress={openGallery} />
             </View>
           </View>
         </Modal>
