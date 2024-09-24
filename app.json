@@ -16,6 +16,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.tjuhasz.rescueapp-bussiness",
       "googleServicesFile": "./GoogleService-Info.plist",
+      "usesAppleSignIn": true,
       "config": {
         "usesNonExemptEncryption": false
       }

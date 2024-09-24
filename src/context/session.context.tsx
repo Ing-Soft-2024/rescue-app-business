@@ -43,6 +43,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     }, []);
 
     React.useEffect(() => {
+        if (!session) return router.replace("/signin");
         router.replace("/(app)/");
     }, [session])
 
@@ -54,6 +55,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
                 authMethods[method].signIn(opt)
                     .then((session) => {
+                        if (!session) return;
                         setSession(session);
 
                         // Save session to secure store, persisting the session
@@ -66,8 +68,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             },
             signOut: () => {
                 if (!session) return;
-                if (!isValidAuthMethod(session.method)) throw Error("Invalid sign out method");
-                authMethods[session.method].signOut()
+                // if (!isValidAuthMethod(session.method)) throw Error("Invalid sign out method");
+                authMethods["Google"].signOut()
                     .then(() => {
                         setSession(undefined);
 

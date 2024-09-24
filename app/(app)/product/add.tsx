@@ -1,4 +1,9 @@
+import { productConsumer } from "@/src/services/client";
+import { ProductType } from "@/src/types/product.type";
 import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+
+import React from "react";
 import { KeyboardAvoidingView, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 const LabeledInput = ({ label, children, ...props }: {
@@ -13,6 +18,23 @@ const LabeledInput = ({ label, children, ...props }: {
 )
 
 export default function ProductPage() {
+    const router = useRouter();
+    const [product, setProduct] = React.useState<ProductType>({
+        name: '',
+        description: '',
+        price: 0,
+        image: '',
+        businessId: 1
+    });
+
+    const cancelProduct = () => router.back();
+
+    const saveProduct = () => {
+        productConsumer.consume('POST', { data: product })
+            .then(() => router.back())
+            .catch(console.error);
+    };
+
     return (
         <KeyboardAvoidingView style={{
             padding: 5,
@@ -20,7 +42,11 @@ export default function ProductPage() {
             gap: 10
         }}>
             <LabeledInput label="Nombre">
-                <TextInput style={styles.input} placeholder="Nombre" />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Nombre"
+                    onChangeText={(text) => setProduct((product) => ({ ...product, name: text }))}
+                />
             </LabeledInput>
             <LabeledInput label="Descripción">
                 <TextInput
@@ -28,6 +54,8 @@ export default function ProductPage() {
                         ...styles.input,
                         height: 150,
                     }}
+
+                    onChangeText={(text) => setProduct((product) => ({ ...product, description: text }))}
                     placeholder="Descripción"
                     multiline={true}
                 />
@@ -39,6 +67,7 @@ export default function ProductPage() {
                         style={{ flex: 1 }}
                         placeholder="Precio"
                         keyboardType="numeric"
+                        onChangeText={(text) => setProduct((product) => ({ ...product, price: Number(text) }))}
                     />
                 </View>
             </LabeledInput>
@@ -53,6 +82,8 @@ export default function ProductPage() {
                         borderRadius: 5,
                         alignItems: "center"
                     })}
+
+                    onPress={saveProduct}
                 >
                     <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
                 </Pressable>
@@ -64,6 +95,7 @@ export default function ProductPage() {
                         borderRadius: 5,
                         alignItems: "center"
                     })}
+                    onPress={cancelProduct}
                 >
                     <Text style={{ color: "white", fontSize: 16 }}>Cancelar</Text>
                 </Pressable>
