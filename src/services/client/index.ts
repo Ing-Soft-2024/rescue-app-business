@@ -40,3 +40,7 @@ export const productDetailsConsumer = apiConsumerFactory({
     validEndpoints: ['GET', 'POST', 'DELETE']
 });
 
+export const storageConsumer = apiConsumerFactory({
+    endpoint: 'storage',
+    validEndpoints: ['GET', 'POST']
+});
