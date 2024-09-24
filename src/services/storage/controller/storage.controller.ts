@@ -1,6 +1,6 @@
 import { storageConsumer } from "@/src/services/client";
-import { eliminarDiacriticos } from "@/src/utils/eliminarDiacriticos";
 import { base64ToFile, fileToBase64 } from "../utils/base64";
+import { eliminarDiacriticos } from "../utils/eliminarDiacriticos";
 
 const baseAPI = process.env['NEXT_PUBLIC_API_URL'] + '/api';
 class StorageError extends Error {
