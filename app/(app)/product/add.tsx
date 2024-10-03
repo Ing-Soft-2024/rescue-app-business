@@ -22,7 +22,6 @@ const LabeledInput = ({ label, children, ...props }: {
 )
 
 
-
 export default function ProductPage() {
 
      const [image, setImage] = useState<string | null>();
@@ -35,7 +34,8 @@ export default function ProductPage() {
         description: '',
         price: 0,
         image: '',
-        businessId: 1
+        businessId: 1,
+        createdAt: new Date()
     });
 
     const cancelProduct = () => router.back();
@@ -136,7 +136,7 @@ export default function ProductPage() {
             </View>
         </KeyboardAvoidingView>
     );
-}
+} }
 
 const styles = StyleSheet.create({
     input: {

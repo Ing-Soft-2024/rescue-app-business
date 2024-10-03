@@ -7,34 +7,34 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0321CE96FD1E4FCFAE4CCE8E /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C0A7D309B404865A292C558 /* noop-file.swift */; };
-		0CFE8D2E6136C9C19338F82E /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A00CD1EF08FDA70C2FB9CC13 /* PrivacyInfo.xcprivacy */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		3C519A380A20436288AA51C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5FEB0E567B664806ADF1B9D8 /* GoogleService-Info.plist */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		79298CB47ED042449A386C55 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 04D4B79A8964482BA66A9D28 /* GoogleService-Info.plist */; };
+		5921DB36980649C993ED3551 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E65476EF8E4937B9F997C5 /* noop-file.swift */; };
+		6654017181A9C4C7E9D935B0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 655930E045C4AF2FC9D70814 /* PrivacyInfo.xcprivacy */; };
 		96905EF65AED1B983A6B3ABC /* libPods-rescueappbussiness.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-rescueappbussiness.a */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		04D4B79A8964482BA66A9D28 /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "rescueappbussiness/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* rescueappbussiness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = rescueappbussiness.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = rescueappbussiness/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = rescueappbussiness/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = rescueappbussiness/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = rescueappbussiness/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = rescueappbussiness/main.m; sourceTree = "<group>"; };
-		1C0A7D309B404865A292C558 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "rescueappbussiness/noop-file.swift"; sourceTree = "<group>"; };
 		58EEBF8E8E6FB1BC6CAF49B5 /* libPods-rescueappbussiness.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-rescueappbussiness.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5FEB0E567B664806ADF1B9D8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "rescueappbussiness/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		62AE603223E04BF68CB04F08 /* rescueappbussiness-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "rescueappbussiness-Bridging-Header.h"; path = "rescueappbussiness/rescueappbussiness-Bridging-Header.h"; sourceTree = "<group>"; };
+		655930E045C4AF2FC9D70814 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = rescueappbussiness/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6C2E3173556A471DD304B334 /* Pods-rescueappbussiness.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rescueappbussiness.debug.xcconfig"; path = "Target Support Files/Pods-rescueappbussiness/Pods-rescueappbussiness.debug.xcconfig"; sourceTree = "<group>"; };
 		7A4D352CD337FB3A3BF06240 /* Pods-rescueappbussiness.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rescueappbussiness.release.xcconfig"; path = "Target Support Files/Pods-rescueappbussiness/Pods-rescueappbussiness.release.xcconfig"; sourceTree = "<group>"; };
-		A00CD1EF08FDA70C2FB9CC13 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = rescueappbussiness/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A1E65476EF8E4937B9F997C5 /* noop-file.swift */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.swift; name = "noop-file.swift"; path = "rescueappbussiness/noop-file.swift"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = rescueappbussiness/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		C37C2E1294834B0CB3319490 /* rescueappbussiness-Bridging-Header.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "rescueappbussiness-Bridging-Header.h"; path = "rescueappbussiness/rescueappbussiness-Bridging-Header.h"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-rescueappbussiness/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -61,10 +61,10 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				04D4B79A8964482BA66A9D28 /* GoogleService-Info.plist */,
-				1C0A7D309B404865A292C558 /* noop-file.swift */,
-				C37C2E1294834B0CB3319490 /* rescueappbussiness-Bridging-Header.h */,
-				A00CD1EF08FDA70C2FB9CC13 /* PrivacyInfo.xcprivacy */,
+				5FEB0E567B664806ADF1B9D8 /* GoogleService-Info.plist */,
+				A1E65476EF8E4937B9F997C5 /* noop-file.swift */,
+				62AE603223E04BF68CB04F08 /* rescueappbussiness-Bridging-Header.h */,
+				655930E045C4AF2FC9D70814 /* PrivacyInfo.xcprivacy */,
 			);
 			name = rescueappbussiness;
 			sourceTree = "<group>";
@@ -150,13 +150,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "rescueappbussiness" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				F7CF641A7BA9133B97E8A8A2 /* [Expo] Configure project */,
+				56B1EDD8D555C1B9CFFF0F78 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				EE4898C4B2F8CEFB8B135977 /* [CP] Embed Pods Frameworks */,
+				E907B3AB06FBDCA7683844AB /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -177,7 +177,7 @@
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1250;
-						DevelopmentTeam = "B2X6947DBK";
+						DevelopmentTeam = "J8UPXAU92J";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -208,8 +208,8 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				79298CB47ED042449A386C55 /* GoogleService-Info.plist in Resources */,
-				0CFE8D2E6136C9C19338F82E /* PrivacyInfo.xcprivacy in Resources */,
+				3C519A380A20436288AA51C5 /* GoogleService-Info.plist in Resources */,
+				6654017181A9C4C7E9D935B0 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +253,25 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		56B1EDD8D555C1B9CFFF0F78 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-rescueappbussiness/expo-configure-project.sh\"\n";
+		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -287,7 +306,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-rescueappbussiness/Pods-rescueappbussiness-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EE4898C4B2F8CEFB8B135977 /* [CP] Embed Pods Frameworks */ = {
+		E907B3AB06FBDCA7683844AB /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -305,25 +324,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-rescueappbussiness/Pods-rescueappbussiness-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F7CF641A7BA9133B97E8A8A2 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-rescueappbussiness/expo-configure-project.sh\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -334,7 +334,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				0321CE96FD1E4FCFAE4CCE8E /* noop-file.swift in Sources */,
+				5921DB36980649C993ED3551 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -371,7 +371,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
-				DEVELOPMENT_TEAM = "B2X6947DBK";
+				DEVELOPMENT_TEAM = "J8UPXAU92J";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 			};
@@ -401,7 +401,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
-				DEVELOPMENT_TEAM = "B2X6947DBK";
+				DEVELOPMENT_TEAM = "J8UPXAU92J";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 			};
