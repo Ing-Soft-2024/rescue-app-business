@@ -26,18 +26,18 @@ export type ApiRequestConfig = Exclude<AxiosRequestConfig, "method" | "url"> & {
     "queryParams"?: { [key: string]: any }
 }
 
-class ApiConsumerFactory<ValidMethods extends string> {
+export class ApiConsumerFactory<ValidMethods extends string> {
     _axios: Axios;
     _endpoint: string;
     _validEndpoints?: ValidMethods[];
-    static baseURL = process.env['REACT_PUBLIC_API_URL'];
+    static baseURL = process.env['EXPO_PUBLIC_API_URL'];
 
     constructor({ endpoint, validEndpoints }: {
         endpoint: string,
         validEndpoints?: ValidMethods[]
     }) {
         this._axios = axios.create({ baseURL: ApiConsumerFactory.baseURL, headers: { 'Content-Type': 'application/json' } });
-        this._endpoint = `${ApiConsumerFactory.baseURL}${endpoint}`;
+        this._endpoint = `${ApiConsumerFactory.baseURL}/api/${endpoint}`;
         this._validEndpoints = validEndpoints?.map(method => method.toUpperCase() as ValidMethods);
     }
 
@@ -76,7 +76,7 @@ class ApiConsumerFactory<ValidMethods extends string> {
         method: ValidMethods,
         data?: ApiRequestConfig
     ) => {
-        console.log(method, data);
+        console.log(this._endpoint, method, data);
         if (this._validEndpoints && !this._validEndpoints.includes(method))
             throw new ApiException(405, 'Method not implemented');
 

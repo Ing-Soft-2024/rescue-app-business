@@ -1,3 +1,4 @@
+import { ProductType } from "@/src/types/product.type";
 import { Image, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -5,13 +6,13 @@ import { ProductActions } from "./actions";
 
 
 
-export const ProductItem = () => {
-
+export const ProductItem = ({ product }: { product: ProductType }) => {
+    console.log(product);
     return (
         <GestureHandlerRootView>
             <Swipeable
                 shouldCancelWhenOutside={false}
-                renderRightActions={() => <ProductActions />}
+                renderRightActions={() => <ProductActions id={product.id!} />}
             >
                 <View style={{
                     flexDirection: "row",
@@ -41,7 +42,7 @@ export const ProductItem = () => {
                             fontSize: 16,
                             fontWeight: "semibold"
                         }}>
-                            Product Item 1
+                            {product?.name}
                         </Text>
                         <Text style={{
                             fontSize: 14,
@@ -50,7 +51,7 @@ export const ProductItem = () => {
                             {new Intl.NumberFormat("es-AR", {
                                 style: "currency",
                                 currency: "ARS"
-                            }).format(1000)}
+                            }).format(product?.price)}
                         </Text>
                     </View>
                 </View>

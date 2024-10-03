@@ -1,9 +1,13 @@
+import { productConsumer } from "@/src/services/client";
+import { ProductType } from "@/src/types/product.type";
 import { FontAwesome } from "@expo/vector-icons";
+
 import { Image, KeyboardAvoidingView, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import ImageModalProps from "@/src/components/images/imageModal";
 import ImageModal from "@/src/components/images/imageModal";
+import { useRouter } from "expo-router";
 
 
 const LabeledInput = ({ label, children, ...props }: {
@@ -20,10 +24,26 @@ const LabeledInput = ({ label, children, ...props }: {
 
 
 export default function ProductPage() {
+
      const [image, setImage] = useState<string | null>();
 
     const handleImageSelect = (imageUri: string) => {
         setImage(imageUri); // Update the state with the selected image URI
+    const router = useRouter();
+    const [product, setProduct] = React.useState<ProductType>({
+        name: '',
+        description: '',
+        price: 0,
+        image: '',
+        businessId: 1
+    });
+
+    const cancelProduct = () => router.back();
+
+    const saveProduct = () => {
+        productConsumer.consume('POST', { data: product })
+            .then(() => router.back())
+            .catch(console.error);
     };
 
     return (
@@ -37,7 +57,11 @@ export default function ProductPage() {
         }}>
         
             <LabeledInput label="Nombre">
-                <TextInput style={styles.input} placeholder="Nombre" />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Nombre"
+                    onChangeText={(text) => setProduct((product) => ({ ...product, name: text }))}
+                />
             </LabeledInput>
             <LabeledInput label="Descripción">
                 <TextInput
@@ -45,6 +69,8 @@ export default function ProductPage() {
                         ...styles.input,
                         height: 150,
                     }}
+
+                    onChangeText={(text) => setProduct((product) => ({ ...product, description: text }))}
                     placeholder="Descripción"
                     multiline={true}
                 />
@@ -56,6 +82,7 @@ export default function ProductPage() {
                         style={{ flex: 1 }}
                         placeholder="Precio"
                         keyboardType="numeric"
+                        onChangeText={(text) => setProduct((product) => ({ ...product, price: Number(text) }))}
                     />
                 </View>
             </LabeledInput>
@@ -89,6 +116,8 @@ export default function ProductPage() {
                         borderRadius: 5,
                         alignItems: "center"
                     })}
+
+                    onPress={saveProduct}
                 >
                     <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
                 </Pressable>
@@ -100,6 +129,7 @@ export default function ProductPage() {
                         borderRadius: 5,
                         alignItems: "center"
                     })}
+                    onPress={cancelProduct}
                 >
                     <Text style={{ color: "white", fontSize: 16 }}>Cancelar</Text>
                 </Pressable>
