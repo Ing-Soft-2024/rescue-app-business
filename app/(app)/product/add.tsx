@@ -1,10 +1,14 @@
 import { productConsumer } from "@/src/services/client";
 import { ProductType } from "@/src/types/product.type";
 import { FontAwesome } from "@expo/vector-icons";
+
+import { Image, KeyboardAvoidingView, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
+import ImageModalProps from "@/src/components/images/imageModal";
+import ImageModal from "@/src/components/images/imageModal";
 import { useRouter } from "expo-router";
 
-import React from "react";
-import { KeyboardAvoidingView, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 const LabeledInput = ({ label, children, ...props }: {
     label: string;
@@ -17,7 +21,14 @@ const LabeledInput = ({ label, children, ...props }: {
     </View>
 )
 
+
+
 export default function ProductPage() {
+
+     const [image, setImage] = useState<string | null>();
+
+    const handleImageSelect = (imageUri: string) => {
+        setImage(imageUri); // Update the state with the selected image URI
     const router = useRouter();
     const [product, setProduct] = React.useState<ProductType>({
         name: '',
@@ -36,11 +47,15 @@ export default function ProductPage() {
     };
 
     return (
+
+        
+        
         <KeyboardAvoidingView style={{
             padding: 5,
             flex: 1,
             gap: 10
         }}>
+        
             <LabeledInput label="Nombre">
                 <TextInput
                     style={styles.input}
@@ -75,6 +90,25 @@ export default function ProductPage() {
             <View style={{
                 gap: 10
             }}>
+                 
+
+
+                {/* <Image source={image ? {image} : uri: "https://tr.rbxcdn.com/97406b6891c98069d3dd80e7be2dd8f0/420/420/Image/Png"}
+                style = {styles.image}
+                /> */}
+                
+            <ImageModalProps onImageSelect={handleImageSelect}></ImageModalProps>
+           
+                
+            {image && (
+                    <Image
+                        source={{ uri: image }}
+                        style={styles.image}
+                    />
+                )}
+                
+
+
                 <Pressable
                     style={({ pressed }) => ({
                         backgroundColor: pressed ? "#333" : "#000",
@@ -116,5 +150,12 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: "bold"
+    },
+
+    image:
+    {
+        width: 200,
+    height: 200,
+    marginTop: 20,
     }
 });

@@ -8,6 +8,10 @@
     <true/>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Necesitamos acceso para subir fotos</string>
+
     <key>CFBundleDisplayName</key>
     <string>rescueapp-bussiness</string>
     <key>CFBundleExecutable</key>
