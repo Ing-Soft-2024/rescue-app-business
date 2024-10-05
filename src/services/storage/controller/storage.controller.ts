@@ -1,6 +1,6 @@
 import { storageConsumer } from "@/src/services/client";
-import { base64ToFile, fileToBase64 } from "../utils/base64";
-import { eliminarDiacriticos } from "../utils/eliminarDiacriticos";
+import { base64ToFile, fileToBase64, convertFileToBase64 } from "../utils/base64";
+import { eliminarDiacriticos } from "../utils/eliminarDiacriticos"
 
 const baseAPI = process.env['NEXT_PUBLIC_API_URL'] + '/api';
 class StorageError extends Error {
@@ -10,24 +10,13 @@ class StorageError extends Error {
     }
 }
 export default class StorageController {
-    static upload = async (file: File, pathTo?: string): Promise<string | undefined> => {
+    static upload = async (file: string, pathTo?: string): Promise<string | undefined> => {
         if (!file) return undefined;
-        const base64File = await fileToBase64(file);
-        let fileName = file.name;
-        const parts = fileName.split('.');
-        if (parts.length >= 2) {
-            const ext = parts[parts.length - 1];
-            parts.pop();
-            fileName = parts.join('_');
-            fileName += `.${ext}`;
-            fileName = fileName.replace(/\s/g, '_');
-            fileName = eliminarDiacriticos(fileName);
-        }
-        fileName = pathTo ? `${pathTo}/${fileName}` : fileName;
+        const base64File = convertFileToBase64(file);
         try {
             return storageConsumer.consume("POST", {
                 "data": {
-                    "fileName": fileName,
+                    "fileName": pathTo ?? "product.jpg",
                     "file": base64File
                 }
             });

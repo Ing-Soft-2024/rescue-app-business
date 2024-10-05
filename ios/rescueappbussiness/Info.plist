@@ -91,7 +91,7 @@
     <string>Automatic</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
-    <key>GIDClient</key>
+    <key>GIDClientID</key>
     <string>140859937803-tb7u8nksgh5jnhli429l9betc0dqt83h.apps.googleusercontent.com</string>
   </dict>
 </plist>
