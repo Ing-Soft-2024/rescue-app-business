@@ -13,12 +13,6 @@ export default function AppLayout() {
         <Stack
             screenOptions={{
                 headerBackTitleVisible: false,
-                // headerLeft: ({ canGoBack }) => !canGoBack && (
-                //     <Button
-                //         title="Cerrar sesión"
-                //         onPress={signOut}
-                //     />
-                // ),
                 headerRight: () => (
                     <Pressable
                         style={({ pressed }) => ({
@@ -34,7 +28,15 @@ export default function AppLayout() {
         >
             <Stack.Screen name="index" options={{ title: "Mis Productos" }} />
             <Stack.Screen name="notifications/index" options={{ title: "Notificaciones" }} />
+            <Stack.Screen
+                name="product/addPhoto"
+                options={{
+                    "title": "Agregar Producto",
+                    "headerShown": false
+                }}
+            />
             <Stack.Screen name="product/add" options={{ title: "Agregar Producto" }} />
+            {/* <Stack.Screen name="product/[id]" options={{ title: "Product Page" }}></Stack.Screen> */}
         </Stack>
     );
 }

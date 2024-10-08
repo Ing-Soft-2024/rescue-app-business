@@ -20,7 +20,7 @@ export const FloatingButton = () => {
                 elevation: pressed ? 0 : 5,
                 transform: [{ "scale": pressed ? 0.95 : 1 }]
             })}
-            onPress={() => router.push("/product/add")}
+            onPress={() => router.push("/product/addPhoto")}
         >
             <AntDesign name="plus" size={24} color="white" />
         </Pressable>
