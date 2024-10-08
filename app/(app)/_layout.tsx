@@ -1,4 +1,5 @@
 import { useSession } from "@/context/session.context";
+import { DrawerContent } from "@/src/components/base/drawer.button";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Redirect, useRouter } from "expo-router";
 import { Drawer } from "expo-router/drawer";
@@ -30,13 +31,14 @@ export default function AppLayout() {
                             })}
                             onPress={() => router.push("/notifications")}
                         >
-                            <MaterialIcons name="notifications" size={24} color="black" />
+                            <MaterialIcons name="notifications" size={24} color={"#D4685E"} />
                         </Pressable>
                     ),
                     drawerInactiveTintColor: '#E1958E',
                     drawerActiveTintColor: '#D4685E',
-                    drawerType: "front"
+                    drawerType: "front",
                 }}
+                drawerContent={(props) => <DrawerContent {...props} />}
             >
                 <Drawer.Screen
                     name="index"
