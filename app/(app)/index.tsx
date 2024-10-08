@@ -5,7 +5,7 @@ import { useClientFetch } from "@/src/hooks/fetch.hook";
 import { commerceDetailsConsumer } from "@/src/services/client";
 import { ProductType } from "@/src/types/product.type";
 import React from "react";
-import { Button, FlatList, RefreshControl, Text } from "react-native";
+import { FlatList, RefreshControl, Text } from "react-native";
 
 export default function ProductPage() {
     const { signOut } = useSession();
@@ -30,10 +30,10 @@ export default function ProductPage() {
             />
             <FloatingButton />
 
-            <Button
+            {/* <Button
                 title="Cerrar sesion"
                 onPress={signOut}
-            />
+            /> */}
         </>
     );
 }

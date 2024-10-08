@@ -35,19 +35,30 @@ export default function AppLayout() {
                     ),
                     drawerInactiveTintColor: '#E1958E',
                     drawerActiveTintColor: '#D4685E',
+                    drawerType: "front"
                 }}
             >
-                <Drawer.Screen name="index" options={{ title: "Mis Productos" }} />
-                <Drawer.Screen name="notifications/index" options={{ title: "Notificaciones" }} />
+                <Drawer.Screen
+                    name="index"
+                    options={{
+                        title: "Mis Productos",
+                        drawerIcon: (props) => <MaterialIcons name="home" {...props} />
+                    }} />
+                <Drawer.Screen
+                    name="notifications/index"
+                    options={{
+                        title: "Notificaciones",
+                        drawerIcon: (props) => <MaterialIcons name="notifications" {...props} />
+                    }} />
                 <Drawer.Screen
                     name="product"
                     options={{
                         "title": "Agregar Producto",
                         "headerShown": false,
+                        "drawerIcon": (props) => <MaterialIcons name="add" {...props} />,
+                        "swipeEnabled": false,
                     }}
                 />
-                {/* <Drawer.Screen name="product/add" options={{ title: "Agregar Producto" }} /> */}
-                {/* <Stack.Screen name="product/[id]" options={{ title: "Product Page" }}></Stack.Screen> */}
             </Drawer>
         </GestureHandlerRootView>
     );
