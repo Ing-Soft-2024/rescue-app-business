@@ -20,52 +20,66 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
 
     return (
         <GestureHandlerRootView>
-            <Swipeable
-                shouldCancelWhenOutside={false}
-                renderRightActions={() => <ProductActions id={product.id!} />}
-            >
-                <View style={{
-                    flexDirection: "row",
-                    gap: 15,
-                    padding: 1,
-                    backgroundColor: "#FAFAFF",
-                }}>
+            <View style={{
+                gap: 15,
+                backgroundColor: "#FAFAFF",
+                margin: 5,
+                borderRadius: 10,
+                borderColor: "#0002",
+                borderWidth: 1,
+
+                overflow: "hidden",
+            }}>
+                <Swipeable
+                    shouldCancelWhenOutside={false}
+                    renderRightActions={() => <ProductActions id={product.id!} />}
+                >
                     <View style={{
-                        backgroundColor: "black",
-                        height: 75,
-                        width: 75,
-                        borderRadius: 5
+                        flexDirection: "row",
+                        width: "100%",
+                        backgroundColor: "#FAFAFF",
+                        gap: 15,
+                        padding: 5,
                     }}>
-                        <Image
-                            source={{ uri: image }}
-                            fadeDuration={10}
-                            style={{
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: 5,
-                                resizeMode: "cover"
-                            }}
-                        />
-                    </View>
-                    <View style={{ paddingVertical: 5, gap: 4 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: "semibold"
+                        <View style={{
+                            backgroundColor: "black",
+                            height: 75,
+                            width: 75,
+                            borderRadius: 5,
                         }}>
-                            {product?.name}
-                        </Text>
-                        <Text style={{
-                            fontSize: 14,
-                            fontWeight: "bold"
-                        }}>
-                            {new Intl.NumberFormat("es-AR", {
-                                style: "currency",
-                                currency: "ARS"
-                            }).format(product?.price)}
-                        </Text>
+                            <Image
+                                source={{ uri: image }}
+                                fadeDuration={10}
+                                style={{
+                                    height: "100%",
+                                    width: "100%",
+                                    borderRadius: 5,
+                                    resizeMode: "cover"
+                                }}
+                            />
+                        </View>
+                        <View style={{ paddingVertical: 5, gap: 4, justifyContent: "space-between" }}>
+                            <Text style={{
+                                fontSize: 18,
+                                fontWeight: "bold",
+                                color: "#D8776E"
+                            }}>
+                                {product?.name}
+                            </Text>
+                            <Text style={{
+                                fontSize: 14,
+                                fontWeight: "semibold",
+                                color: "#D8776E"
+                            }}>
+                                {new Intl.NumberFormat("es-AR", {
+                                    style: "currency",
+                                    currency: "ARS"
+                                }).format(product?.price)}
+                            </Text>
+                        </View>
                     </View>
-                </View>
-            </Swipeable>
+                </Swipeable>
+            </View>
         </GestureHandlerRootView>
     );
 }
