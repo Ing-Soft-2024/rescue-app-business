@@ -1,8 +1,13 @@
 import { storageConsumer } from "@/src/services/client";
+
+import * as FileSystem from "expo-file-system";
+
+
 import { base64ToFile, fileToBase64, convertFileToBase64 } from "../utils/base64";
 import { eliminarDiacriticos } from "../utils/eliminarDiacriticos"
 
 const baseAPI = process.env['NEXT_PUBLIC_API_URL'] + '/api';
+
 class StorageError extends Error {
     constructor(message: string) {
         super(message);
@@ -11,13 +16,30 @@ class StorageError extends Error {
 }
 export default class StorageController {
     static upload = async (file: string, pathTo?: string): Promise<string | undefined> => {
-        if (!file) return undefined;
-        const base64File = convertFileToBase64(file);
+
+        let fileName = file?.split('/').pop();
+        if (!fileName || !file) return undefined;
+        const base64 = await FileSystem.readAsStringAsync(file, { encoding: FileSystem.EncodingType.Base64 });
+
+        // if (!FileSystem) return undefined;
+        // const base64File = await FileSystem.readAsStringAsync(file, { encoding: FileSystem.EncodingType.Base64 });
+        // console.log(base64File);
+        const parts = fileName.split('.');
+        if (parts.length >= 2) {
+            const ext = parts[parts.length - 1];
+            parts.pop();
+            fileName = parts.join('_');
+            fileName += `.${ext}`;
+            fileName = fileName.replace(/\s/g, '_');
+            fileName = eliminarDiacriticos(fileName);
+        }
+        fileName = pathTo ? `${pathTo}/${fileName}` : fileName;
         try {
             return storageConsumer.consume("POST", {
                 "data": {
-                    "fileName": pathTo ?? "product.jpg",
-                    "file": base64File
+                    "fileName": fileName,
+                    "file": base64
+
                 }
             });
         } catch {
@@ -25,13 +47,13 @@ export default class StorageController {
         }
     }
 
-    static download = async (fileName: string): Promise<File> => {
+    static download = async (fileName: string): Promise<string> => {
         if (!fileName) throw new StorageError('No file name Provided');
         const base64File = await storageConsumer.consume("GET", {
             "queryParams": {
                 "fileName": fileName
             }
         })
-        return base64ToFile(base64File, fileName);
+        return `data:image/png;base64,${base64File}`;
     }
 }

@@ -14,13 +14,13 @@ export const FloatingButton = () => {
                 width: 65,
                 height: 65,
                 borderRadius: 50,
-                backgroundColor: pressed ? "#333" : "#000",
+                backgroundColor: pressed ? "#E1958E" : "#D4685E",
                 alignItems: "center",
                 justifyContent: "center",
                 elevation: pressed ? 0 : 5,
                 transform: [{ "scale": pressed ? 0.95 : 1 }]
             })}
-            onPress={() => router.push("/product/add")}
+            onPress={() => router.push("/product/")}
         >
             <AntDesign name="plus" size={24} color="white" />
         </Pressable>
