@@ -1,6 +1,13 @@
 import { storageConsumer } from "@/src/services/client";
+
 import * as FileSystem from "expo-file-system";
-import { eliminarDiacriticos } from "../utils/eliminarDiacriticos";
+
+
+import { base64ToFile, fileToBase64, convertFileToBase64 } from "../utils/base64";
+import { eliminarDiacriticos } from "../utils/eliminarDiacriticos"
+
+const baseAPI = process.env['NEXT_PUBLIC_API_URL'] + '/api';
+
 class StorageError extends Error {
     constructor(message: string) {
         super(message);
@@ -9,6 +16,7 @@ class StorageError extends Error {
 }
 export default class StorageController {
     static upload = async (file: string, pathTo?: string): Promise<string | undefined> => {
+
         let fileName = file?.split('/').pop();
         if (!fileName || !file) return undefined;
         const base64 = await FileSystem.readAsStringAsync(file, { encoding: FileSystem.EncodingType.Base64 });
@@ -31,6 +39,7 @@ export default class StorageController {
                 "data": {
                     "fileName": fileName,
                     "file": base64
+
                 }
             });
         } catch {

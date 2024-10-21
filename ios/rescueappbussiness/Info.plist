@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+
 <dict>
 	<key>GIDClientID</key>
 	<string>140859937803-tb7u8nksgh5jnhli429l9betc0dqt83h.apps.googleusercontent.com</string>
@@ -94,4 +95,5 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
+
 </plist>

@@ -3,9 +3,16 @@ import StorageController from "@/src/services/storage/controller/storage.control
 import { ProductType } from "@/src/types/product.type";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 
+
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { Image, KeyboardAvoidingView, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, KeyboardAvoidingView, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View, ScrollView } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
+import ImageModalProps from "@/src/components/images/imageModal";
+import ImageModal from "@/src/components/images/imageModal";
+import StorageController from "@/src/services/storage/controller/storage.controller";
+
 
 
 const LabeledInput = ({ label, children, ...props }: {
@@ -21,8 +28,14 @@ const LabeledInput = ({ label, children, ...props }: {
 
 
 export default function ProductPage() {
+
     const params = useLocalSearchParams();
     const image = React.useMemo<string>(() => params.imageUri as string, []);
+
+
+    
+    const router = useRouter();
+
     const [product, setProduct] = React.useState<ProductType>({
         name: '',
         description: '',
@@ -37,6 +50,7 @@ export default function ProductPage() {
     const cancelProduct = () => router.back();
 
     const saveProduct = () => {
+
         if (!image) return;
         StorageController.upload(image!)
             .then((image) => {
@@ -154,6 +168,9 @@ export default function ProductPage() {
                 </Pressable>
             </View>
         </KeyboardAvoidingView>
+
+       
+
     );
 }
 
@@ -168,6 +185,17 @@ const styles = StyleSheet.create({
 
     label: {
         fontSize: 14,
+
         fontWeight: "semibold"
+
+        
+    },
+
+    image:
+    {
+        width: 200,
+        height: 200,
+        marginTop: 20,
+
     }
 });
