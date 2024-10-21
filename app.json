@@ -38,17 +38,22 @@
       "expo-router",
       "expo-secure-store",
       "@react-native-google-signin/google-signin",
+      
       [
-        "expo-camera",
+        "expo-dev-launcher",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-          "recordAudioAndroid": true
+          "launchMode": "most-recent"
+
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "60997fa7-b47a-4e0a-844b-2985a68acb2a"
+      }
     }
   }
 }

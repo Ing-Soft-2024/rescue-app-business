@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "155239217291",
+    "project_id": "rescue-business",
+    "storage_bucket": "rescue-business.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155239217291:android:1a780eece6d39f0624bc8e",
+        "android_client_info": {
+          "package_name": "com.tjuhasz.rescueappbussiness"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCR1tIS1OorOWKRXLsj7isTVNnMZpNV24M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
