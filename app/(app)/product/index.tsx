@@ -3,16 +3,24 @@ import { CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GalleryPicker } from "./components/galleryPicker";
 
 export default function AddProduct() {
     const [status, requestPermision] = ImagePicker.useCameraPermissions();
     const [image, setImages] = React.useState<string>();
+    const cameraRef = React.useRef<CameraView>(null);
 
     React.useEffect(() => {
         requestPermision();
     }, []);
+
+    const takePhoto = async () => {
+        if (!cameraRef.current) return;
+        const result = await cameraRef.current.takePictureAsync();
+        if(!result) return;
+        setImages(result.uri);
+    }
 
     const nextStep = () => {
         if (!image) return;
@@ -91,8 +99,36 @@ export default function AddProduct() {
                 onCameraReady={() => {
                     console.log("Camera ready");
                 }}
+                ref={cameraRef}
             />
 
+            <TouchableOpacity
+                style={{
+                    position: "absolute",
+                    bottom: 120,
+                    width: 85,
+                    height: 85,
+                    backgroundColor: "#444",
+                    padding: 10,
+                    borderRadius: 100,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 5,
+                    flexDirection: "row",
+                }}
+                onPress={takePhoto}
+            >
+                <View style={{
+                    backgroundColor: "#ccc",
+                    width: 55,
+                    height: 55,
+                    borderRadius: 100,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 5,
+                    flexDirection: "row",
+                }}></View>
+            </TouchableOpacity>
             <View style={{
                 position: 'absolute',
                 bottom: 20,

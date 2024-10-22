@@ -24,6 +24,7 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
             setIsLoading(false);
         }
     }
+    
     React.useEffect(() => { processImage(product.image); }, [product.image]);
 
     return (
