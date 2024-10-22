@@ -1,11 +1,22 @@
 import { productConsumer } from "@/src/services/client";
-import StorageController from "@/src/services/storage/controller/storage.controller";
+
 import { ProductType } from "@/src/types/product.type";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 
 import { useLocalSearchParams, useRouter } from "expo-router";
+
+
+
+
+
+import { Image, KeyboardAvoidingView, Pressable,Platform, SafeAreaView, StyleSheet, Text, TextInput, View, ScrollView } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+
+import ImageModalProps from "@/src/components/images/imageModal";
+import ImageModal from "@/src/components/images/imageModal";
+import StorageController from "@/src/services/storage/controller/storage.controller";
 import React from "react";
-import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+
 
 
 
