@@ -1,5 +1,5 @@
 import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
-import { CameraView } from "expo-camera";
+// import { CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React from "react";
@@ -79,7 +79,7 @@ export default function AddProduct() {
                 )
             }
 
-            <CameraView
+            {/* <CameraView
                 style={{
                     flex: 1,
                     width: "100%",
@@ -91,7 +91,7 @@ export default function AddProduct() {
                 onCameraReady={() => {
                     console.log("Camera ready");
                 }}
-            />
+            /> */}
 
             <View style={{
                 position: 'absolute',
