@@ -53,6 +53,13 @@ export default function AppLayout() {
                         drawerIcon: (props) => <MaterialIcons name="notifications" {...props} />
                     }} />
                 <Drawer.Screen
+                    name="scan/index"
+                    options={{
+                        title: "Escanear",
+                        "headerShown": false,
+                        drawerIcon: (props) => <MaterialIcons name="qr-code-scanner" {...props} />,
+                    }} />
+                <Drawer.Screen
                     name="product"
                     options={{
                         "title": "Agregar Producto",

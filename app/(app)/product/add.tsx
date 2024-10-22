@@ -3,16 +3,20 @@ import { productConsumer } from "@/src/services/client";
 import { ProductType } from "@/src/types/product.type";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 
-
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import { Image, KeyboardAvoidingView, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View, ScrollView } from "react-native";
+
+
+
+
+import { Image, KeyboardAvoidingView, Pressable,Platform, SafeAreaView, StyleSheet, Text, TextInput, View, ScrollView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
 import ImageModalProps from "@/src/components/images/imageModal";
 import ImageModal from "@/src/components/images/imageModal";
 import StorageController from "@/src/services/storage/controller/storage.controller";
 import React from "react";
+
 
 
 
@@ -32,9 +36,6 @@ export default function ProductPage() {
 
     const params = useLocalSearchParams();
     const image = React.useMemo<string>(() => params.imageUri as string, []);
-
-
-    
 
     const [product, setProduct] = React.useState<ProductType>({
         name: '',
@@ -64,83 +65,87 @@ export default function ProductPage() {
         <KeyboardAvoidingView style={{
             padding: 5,
             flex: 1,
-            gap: 10
-        }}>
-
-            <View style={{
-                width: "100%",
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-            }}>
-                {image && (
-                    <Pressable
-                        style={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: 5,
-                            overflow: 'hidden',
-                            position: 'relative',
-                            marginTop: 20,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                        onPress={() => router.back()}
-                    >
-                        <Image
-                            source={{ uri: image }}
-                            style={StyleSheet.absoluteFillObject}
-                        />
-                        <View style={{
-                            ...StyleSheet.absoluteFillObject,
-                            backgroundColor: 'black',
-                            opacity: 0.5,
-                        }} />
-
-                        <FontAwesome6 name="arrows-rotate" size={22} color="white" />
-                    </Pressable>
-                )}
+            gap: 10 
+        }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+        
                 <View style={{
-                    flex: 1,
-                    gap: 20,
-                    padding: 5,
+                    width: "100%",
+                    flexDirection: 'row',
+                    gap: 10,
+                    alignItems: 'center',
                 }}>
-                    <LabeledInput label="Nombre">
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Nombre"
-                            onChangeText={(text) => setProduct((product) => ({ ...product, name: text }))}
-                        />
-                    </LabeledInput>
-                    <LabeledInput label="Precio">
-                        <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
-                            <FontAwesome name="dollar" size={16} color="black" />
-                            <TextInput
-                                style={{ flex: 1 }}
-                                placeholder="Precio"
-                                keyboardType="numeric"
-                                onChangeText={(text) => setProduct((product) => ({ ...product, price: Number(text) }))}
+                    {image && (
+                        <Pressable
+                            style={{
+                                width: 100,
+                                height: 100,
+                                borderRadius: 5,
+                                overflow: 'hidden',
+                                position: 'relative',
+                                marginTop: 20,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                            onPress={() => router.back()}
+                        >
+                            <Image
+                                source={{ uri: image }}
+                                style={StyleSheet.absoluteFillObject}
                             />
-                        </View>
-                    </LabeledInput>
+                            <View style={{
+                                ...StyleSheet.absoluteFillObject,
+                                backgroundColor: 'black',
+                                opacity: 0.5,
+                            }} />
+
+                            <FontAwesome6 name="arrows-rotate" size={22} color="white" />
+                        </Pressable>
+                    )}
+                    <View style={{
+                        flex: 1,
+                        gap: 20,
+                        padding: 5,
+                    }}>
+                        <LabeledInput label="Nombre">
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Nombre"
+                                onChangeText={(text) => setProduct((product) => ({ ...product, name: text }))}
+                            />
+                        </LabeledInput>
+                        <LabeledInput label="Precio">
+                            <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
+                                <FontAwesome name="dollar" size={16} color="black" />
+                                <TextInput
+                                    style={{ flex: 1 }}
+                                    placeholder="Precio"
+                                    keyboardType="numeric"
+                                    onChangeText={(text) => setProduct((product) => ({ ...product, price: Number(text) }))}
+                                />
+                            </View>
+                        </LabeledInput>
+                    </View>
                 </View>
-            </View>
-            <LabeledInput label="Descripción">
-                <TextInput
-                    style={{
-                        ...styles.input,
-                        height: 150,
-                    }}
 
-                    onChangeText={(text) => setProduct((product) => ({ ...product, description: text }))}
-                    placeholder="Descripción"
-                    multiline={true}
-                />
-            </LabeledInput>
+                <LabeledInput label="Descripción">
+                    <TextInput
+                        style={{
+                            ...styles.input,
+                            height: 150,
+                        }}
 
-            <View style={{
+                        onChangeText={(text) => setProduct((product) => ({ ...product, description: text }))}
+                        placeholder="Descripción"
+                        multiline={true}
+                    />
+                </LabeledInput>
+    
+            <KeyboardAvoidingView style={{
                 gap: 5,
                 marginBottom: 20,
+                flex: 1
             }}>
                 <Pressable
                     style={({ pressed }) => ({
@@ -166,10 +171,8 @@ export default function ProductPage() {
                 >
                     <Text style={{ color: "white", fontSize: 16 }}>Cancelar</Text>
                 </Pressable>
-            </View>
+            </KeyboardAvoidingView>
         </KeyboardAvoidingView>
-
-       
 
     );
 }

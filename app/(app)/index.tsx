@@ -20,7 +20,7 @@ export default function ProductPage() {
     return (
         <>
             <FlatList
-                data={data?.products.sort((a: ProductType, b: ProductType) => {
+                data={data?.products?.sort((a: ProductType, b: ProductType) => {
                     return a.createdAt > b.createdAt ? -1 : 1;
                 }) ?? []}
                 renderItem={({ item }) => (<ProductItem product={item} key={item.id} />)}

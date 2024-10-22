@@ -4,8 +4,8 @@
     "slug": "rescueapp-bussiness",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "icon": "./assets/images/reskue-logo.png",
+    "scheme": "rescueapp-bussiness",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",

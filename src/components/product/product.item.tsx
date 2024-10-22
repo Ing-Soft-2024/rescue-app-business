@@ -1,7 +1,7 @@
 import StorageController from "@/src/services/storage/controller/storage.controller";
 import { ProductType } from "@/src/types/product.type";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { ActivityIndicator, Image, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { ProductActions } from "./actions";
@@ -9,14 +9,23 @@ import { ProductActions } from "./actions";
 
 
 export const ProductItem = ({ product }: { product: ProductType }) => {
-    const [image, setImage] = React.useState<string>(product.image);
+    const [image, setImage] = React.useState<string>("");
+    const [isLoading, setIsLoading] = React.useState(true);
 
-    React.useEffect(() => {
-        if (!product.image) return;
-        StorageController.download(product.image)
-            .then(setImage)
-            .catch(console.error);
-    }, [product.image]);
+    const processImage = async (imageUri: string) => {
+        if (!imageUri) return;
+        setIsLoading(true);
+        try {
+            const image = await StorageController.download(imageUri);
+            setImage(image);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    
+    React.useEffect(() => { processImage(product.image); }, [product.image]);
 
     return (
         <GestureHandlerRootView>
@@ -42,21 +51,29 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
                         padding: 5,
                     }}>
                         <View style={{
-                            backgroundColor: "black",
+                            backgroundColor: "#444",
                             height: 75,
                             width: 75,
                             borderRadius: 5,
+                            alignItems: "center",
+                            justifyContent: "center",
                         }}>
-                            <Image
-                                source={{ uri: image }}
-                                fadeDuration={10}
-                                style={{
-                                    height: "100%",
-                                    width: "100%",
-                                    borderRadius: 5,
-                                    resizeMode: "cover"
-                                }}
-                            />
+                            {isLoading && (
+                                <ActivityIndicator />
+                            )}
+                            {
+                                !isLoading && image && (
+                                <Image
+                                    source={{ uri: image }}
+                                    fadeDuration={1000}
+                                    style={{
+                                        height: "100%",
+                                        width: "100%",
+                                        borderRadius: 5,
+                                        resizeMode: "cover"
+                                    }}
+                                />
+                            )}
                         </View>
                         <View style={{ paddingVertical: 5, gap: 4, justifyContent: "space-between" }}>
                             <Text style={{

@@ -3,16 +3,35 @@ import { CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GalleryPicker } from "./components/galleryPicker";
 
 export default function AddProduct() {
     const [status, requestPermision] = ImagePicker.useCameraPermissions();
     const [image, setImages] = React.useState<string>();
+    const cameraRef = React.useRef<CameraView>(null);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     React.useEffect(() => {
         requestPermision();
     }, []);
+
+    const wrapTakePhoto = async () => {
+        setIsLoading(true);
+        try {
+            const result = await takePhoto();
+            if(result) setImages(result.uri);
+            nextStep();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    const takePhoto = async () => {
+        if (!cameraRef.current) return;
+        return await cameraRef.current.takePictureAsync();
+    }
 
     const nextStep = () => {
         if (!image) return;
@@ -86,12 +105,40 @@ export default function AddProduct() {
                     backgroundColor: '',
                     overflow: 'hidden',
                 }}
-
                 shouldRasterizeIOS={true}
                 onCameraReady={() => {
                     console.log("Camera ready");
                 }}
+                ref={cameraRef}
             />
+
+            <TouchableOpacity
+                style={{
+                    position: "absolute",
+                    bottom: 120,
+                    width: 85,
+                    height: 85,
+                    backgroundColor: "#444",
+                    padding: 10,
+                    borderRadius: 100,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 5,
+                    flexDirection: "row",
+                }}
+                onPress={wrapTakePhoto}
+            >
+                <View style={{
+                    backgroundColor: "#ccc",
+                    width: 55,
+                    height: 55,
+                    borderRadius: 100,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 5,
+                    flexDirection: "row",
+                }}></View>
+            </TouchableOpacity>
 
             <View style={{
                 position: 'absolute',
@@ -153,6 +200,21 @@ export default function AddProduct() {
                         />
                     </Pressable>
                 </View>
+
+                {
+                isLoading && (
+                <ActivityIndicator 
+                    style={{
+                        position: "absolute",
+                        top: 50,
+                        left: 50,
+                        zIndex: 10,
+                    }}
+
+                    size={"large"}
+                />
+                )
+            }
             </View>
         </View>
     );
