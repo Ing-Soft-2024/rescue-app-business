@@ -3,23 +3,34 @@ import { CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React from "react";
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GalleryPicker } from "./components/galleryPicker";
 
 export default function AddProduct() {
     const [status, requestPermision] = ImagePicker.useCameraPermissions();
     const [image, setImages] = React.useState<string>();
     const cameraRef = React.useRef<CameraView>(null);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     React.useEffect(() => {
         requestPermision();
     }, []);
 
+    const wrapTakePhoto = async () => {
+        setIsLoading(true);
+        try {
+            const result = await takePhoto();
+            if(result) setImages(result.uri);
+            nextStep();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
     const takePhoto = async () => {
         if (!cameraRef.current) return;
-        const result = await cameraRef.current.takePictureAsync();
-        if(!result) return;
-        setImages(result.uri);
+        return await cameraRef.current.takePictureAsync();
     }
 
     const nextStep = () => {
@@ -94,7 +105,6 @@ export default function AddProduct() {
                     backgroundColor: '',
                     overflow: 'hidden',
                 }}
-
                 shouldRasterizeIOS={true}
                 onCameraReady={() => {
                     console.log("Camera ready");
@@ -116,7 +126,7 @@ export default function AddProduct() {
                     gap: 5,
                     flexDirection: "row",
                 }}
-                onPress={takePhoto}
+                onPress={wrapTakePhoto}
             >
                 <View style={{
                     backgroundColor: "#ccc",
@@ -129,6 +139,7 @@ export default function AddProduct() {
                     flexDirection: "row",
                 }}></View>
             </TouchableOpacity>
+
             <View style={{
                 position: 'absolute',
                 bottom: 20,
@@ -189,6 +200,21 @@ export default function AddProduct() {
                         />
                     </Pressable>
                 </View>
+
+                {
+                isLoading && (
+                <ActivityIndicator 
+                    style={{
+                        position: "absolute",
+                        top: 50,
+                        left: 50,
+                        zIndex: 10,
+                    }}
+
+                    size={"large"}
+                />
+                )
+            }
             </View>
         </View>
     );
