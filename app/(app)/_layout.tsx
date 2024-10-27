@@ -59,6 +59,16 @@ export default function AppLayout() {
                         "headerShown": false,
                         drawerIcon: (props) => <MaterialIcons name="qr-code-scanner" {...props} />,
                     }} />
+
+                <Drawer.Screen
+                    name="scan/scannedOrder"
+                    options={{
+                        title: "Escanear",
+                        drawerIcon: (props) => <MaterialIcons name="qr-code-scanner" {...props} />,
+                        "swipeEnabled": false,
+                        "headerLeft": () => null,
+                        "headerRight": () => null,
+                    }} />
                 <Drawer.Screen
                     name="product"
                     options={{

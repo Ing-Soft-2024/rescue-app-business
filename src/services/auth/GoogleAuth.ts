@@ -2,6 +2,8 @@ import { Session } from "@/src/types/session.type";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 export class GoogleAuth {
+
+    
     static async signIn(): Promise<Session> {
         const response = await GoogleSignin.signIn().catch((err) => {
             throw new Error("Hubo un error al iniciar sesión con Google");

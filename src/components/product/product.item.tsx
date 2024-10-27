@@ -1,5 +1,6 @@
 import StorageController from "@/src/services/storage/controller/storage.controller";
 import { ProductType } from "@/src/types/product.type";
+import { useFocusEffect } from "expo-router";
 import React from "react";
 import { ActivityIndicator, Image, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -13,19 +14,22 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
     const [isLoading, setIsLoading] = React.useState(true);
 
     const processImage = async (imageUri: string) => {
+        console.log(imageUri);
         if (!imageUri) return;
         setIsLoading(true);
         try {
             const image = await StorageController.download(imageUri);
             setImage(image);
         } catch (error) {
-            console.error(error);
+            console.log(error);
         } finally {
             setIsLoading(false);
         }
     }
     
-    React.useEffect(() => { processImage(product.image); }, [product.image]);
+    useFocusEffect(
+        React.useCallback(() => { processImage(product.image); }, [product.image])
+    );
 
     return (
         <GestureHandlerRootView>
