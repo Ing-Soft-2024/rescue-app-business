@@ -1,6 +1,7 @@
 import { Session } from "@/src/types/session.type";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
+GoogleSignin.configure();
 export class GoogleAuth {
 
     
