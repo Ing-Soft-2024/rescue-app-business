@@ -5,6 +5,7 @@ import { ActivityIndicator, Image, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { ProductActions } from "./actions";
+import { router } from "expo-router";
 
 
 
@@ -92,6 +93,13 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
                                     style: "currency",
                                     currency: "ARS"
                                 }).format(product?.price)}
+                            </Text>
+                            <Text style={{
+                                fontSize: 14,
+                                fontWeight: "semibold",
+                                color: "#D8776E"
+                            }}>
+                                Stock: {product?.stock}
                             </Text>
                         </View>
                     </View>
