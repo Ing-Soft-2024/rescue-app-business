@@ -25,7 +25,11 @@ const LabeledInput = ({ label, children, ...props }: {
     [key: string]: any;
     children: React.ReactNode
 }) => (
-    <View style={{ gap: 2, flex: 1 }}>
+    <View style={{ 
+        gap: 5,
+        minHeight: 70,
+        marginBottom: 10,
+    }}>
         <Text style={styles.label}>{label}</Text>
         {children}
     </View>
@@ -52,6 +56,7 @@ export default function ProductPage() {
     const cancelProduct = () => router.back();
 
     const saveProduct = () => {
+        console.log(product);
 
         if (!image) return;
         StorageController.upload(image!)
@@ -194,24 +199,19 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: "#f9f9f9",
         padding: 10,
+        minHeight: 40,
         borderRadius: 5,
         borderWidth: 1,
         borderColor: "#ccc",
     },
-
     label: {
         fontSize: 14,
-
-        fontWeight: "semibold"
-
-        
+        fontWeight: "semibold",
+        marginBottom: 5,
     },
-
-    image:
-    {
+    image: {
         width: 200,
         height: 200,
         marginTop: 20,
-
     }
 });
