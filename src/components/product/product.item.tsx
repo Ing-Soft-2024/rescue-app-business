@@ -53,8 +53,10 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
                 borderWidth: 1,
 
                 overflow: "hidden",
+                opacity: product.stock === 0 ? 0.5 : 1,
             }}>
                 <Swipeable
+                    key={`swipe-${product.id}-${Date.now()}`}
                     shouldCancelWhenOutside={false}
                     renderRightActions={() => (
                         <View style={{ flexDirection: 'row' }}>

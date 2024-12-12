@@ -36,11 +36,20 @@ export default function EditProductPage() {
 
     const cancelProduct = () => router.back();
 
-    const saveProduct = () => {
-        productDetailsConsumer.consume('POST', {
-            params: { id: product.id },
-            data: product
-        }).then(() => router.back());
+    const saveProduct = async () => {
+        try {
+            await productDetailsConsumer.consume('POST', {
+                params: { id: product.id },
+                data: product
+            });
+            router.back();
+            // Add a small delay to ensure the previous screen is ready
+            setTimeout(() => {
+                router.setParams({ refresh: Date.now().toString() });
+            }, 100);
+        } catch (error) {
+            console.error('Error saving product:', error);
+        }
     };
 
     return (
