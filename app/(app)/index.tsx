@@ -2,10 +2,11 @@ import { FloatingButton } from "@/src/components/base/floating.button";
 import { ProductItem } from "@/src/components/product/product.item";
 import { useSession } from "@/src/context/session.context";
 import { useClientFetch } from "@/src/hooks/fetch.hook";
-import { commerceDetailsConsumer } from "@/src/services/client";
+import { commerceDetailsConsumer, productConsumer } from "@/src/services/client";
 import { ProductType } from "@/src/types/product.type";
 import React from "react";
 import { FlatList, RefreshControl, Text } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 
 export default function ProductPage() {
     const { signOut } = useSession();
@@ -14,6 +15,13 @@ export default function ProductPage() {
         method: 'GET',
         options: { params: { id: 1 } }
     });
+    const params = useLocalSearchParams();
+
+    React.useEffect(() => {
+        if (params.refresh) {
+            reload();
+        }
+    }, [params.refresh]);
 
     console.log(data);
     if (error) return <Text>{error}</Text>;
