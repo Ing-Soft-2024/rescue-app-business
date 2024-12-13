@@ -31,8 +31,8 @@ export default function ProductPage() {
                 data={data?.products?.sort((a: ProductType, b: ProductType) => {
                     return a.createdAt > b.createdAt ? -1 : 1;
                 }) ?? []}
-                renderItem={({ item }) => (<ProductItem product={item} key={item.id} />)}
-                keyExtractor={(item) => item.toString()}
+                renderItem={({ item }) => (<ProductItem product={item} />)}
+                keyExtractor={(item) => item.id.toString()}
                 key="product-list"
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
             />
