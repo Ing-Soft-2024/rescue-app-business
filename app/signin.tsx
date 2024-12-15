@@ -9,6 +9,9 @@ export default function AuthLayout() {
     const router = useRouter();
 
     const navigateToIndex = () => {
+        const checkIfHasBusiness = async () => {
+            
+        }
         router.push('./(screens)/index.tsx');  // lleva al usuario a la pantalla de home (index)
     };
 
