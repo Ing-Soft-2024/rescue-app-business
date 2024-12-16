@@ -73,7 +73,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             signOut: () => {
                 if (!session) return;
                 // if (!isValidAuthMethod(session.method)) throw Error("Invalid sign out method");
-                authMethods["Google"].signOut()
+                authMethods["Credentials"].signOut()
                     .then(() => {
                         setSession(undefined);
 

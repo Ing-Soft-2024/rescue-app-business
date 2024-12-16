@@ -30,7 +30,7 @@ export default function AuthLayout() {
         console.log(session);
         const exists = await hasBusiness(session.user.id);
         if(!exists) return router.push('/create_commerce');
-        router.push('./(screens)/index.tsx');  // lleva al usuario a la pantalla de home (index)
+        //router.push('./(app)/');  // lleva al usuario a la pantalla de home (index)
     };
 
     const navigateToRegister = () => {
