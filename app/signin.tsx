@@ -11,8 +11,9 @@ export default function AuthLayout() {
     const [password, setPassword] = useState('');
 
     const hasBusiness = async (userId: number): Promise<Boolean> => {
+        console.log(userId);
         const response = await userBusinessConsumer.consume('GET', {
-            data: {
+            queryParams: {
                 userId
             }
         }).catch((err) => false); 
@@ -26,6 +27,7 @@ export default function AuthLayout() {
         }).catch((err) => console.error(err));
         if(!session) return;
 
+        console.log(session);
         const exists = await hasBusiness(session.user.id);
         if(!exists) return router.push('/create_commerce');
         router.push('./(screens)/index.tsx');  // lleva al usuario a la pantalla de home (index)

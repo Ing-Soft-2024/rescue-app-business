@@ -24,7 +24,7 @@ export default function RegisterScreen() {
         try {
             await commerceConsumer.consume('POST', {
                 data: {
-                    userId: session?.user.email,
+                    userId: session?.user.id,
                     name,
                     country: "Argentina",
                     address,
@@ -32,7 +32,7 @@ export default function RegisterScreen() {
                     state
                 }
             });
-            router.push('./(screens)/index.tsx');
+            router.push('./(screens)/index');
         } catch (error) {
             console.error('Error al crear comercio:', error);
         }

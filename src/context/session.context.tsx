@@ -44,7 +44,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
     React.useEffect(() => {
         if (!session) return router.replace("/signin");
-        router.replace("/(app)/");
+        router.replace("/(app)");
     }, [session])
 
     return (

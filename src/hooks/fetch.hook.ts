@@ -1,3 +1,4 @@
+import { useFocusEffect } from "expo-router";
 import React from "react";
 import { ApiException } from "../services/client/api.exception";
 import { ApiConsumerFactory, ApiRequestConfig } from "../services/client/api.factory";
@@ -11,8 +12,8 @@ export const useClientFetch = ({ consumer, method, options }: {
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState<string>();
 
-    React.useEffect(() => {
-        if (!loading || error) return;
+    useFocusEffect(React.useCallback(() => {
+        if (loading || error) return;
         consumer.consume(method, options)
             .then(setData)
             .catch((error) => {
@@ -21,7 +22,7 @@ export const useClientFetch = ({ consumer, method, options }: {
                 setError('An unknown error occurred');
             })
             .finally(() => setLoading(false));
-    });
+    }, [options]));
 
     const reload = async () => {
         setLoading(true);

@@ -1,5 +1,6 @@
 import { useSession } from "@/context/session.context";
 import { DrawerContent } from "@/src/components/base/drawer.button";
+import { BusinessProvider } from "@/src/context/business.context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Redirect, useRouter } from "expo-router";
 import { Drawer } from "expo-router/drawer";
@@ -14,8 +15,10 @@ export default function AppLayout() {
 
     if (!session) return <Redirect href={"/signin"} />;
 
+        
     return (
-        <GestureHandlerRootView style={{
+        <BusinessProvider>
+            <GestureHandlerRootView style={{
             flex: 1,
             backgroundColor: '#121212',
         }}>
@@ -70,5 +73,6 @@ export default function AppLayout() {
                 />
             </Drawer>
         </GestureHandlerRootView>
+        </BusinessProvider>
     );
 }

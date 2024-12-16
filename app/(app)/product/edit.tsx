@@ -1,10 +1,10 @@
+import { useBusiness } from "@/src/context/business.context";
 import { productDetailsConsumer } from "@/src/services/client";
 import { ProductType } from "@/src/types/product.type";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Image, KeyboardAvoidingView, Pressable, Platform, StyleSheet, Text, TextInput, View } from "react-native";
 import React from "react";
-import StorageController from "@/src/services/storage/controller/storage.controller";
+import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 const LabeledInput = ({ label, children }: {
     label: string;
@@ -23,6 +23,9 @@ const LabeledInput = ({ label, children }: {
 export default function EditProductPage() {
     const params = useLocalSearchParams();
     const router = useRouter();
+
+    const { business } = useBusiness();
+
     const [product, setProduct] = React.useState<ProductType>({
         id: Number(params.id),
         name: params.name as string,
@@ -30,7 +33,7 @@ export default function EditProductPage() {
         price: Number(params.price),
         image: params.image as string,
         stock: Number(params.stock),
-        businessId: 1,
+        businessId: business?.id,
         createdAt: new Date()
     });
 
