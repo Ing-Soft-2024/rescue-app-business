@@ -1,29 +1,30 @@
 import { productConsumer } from "@/src/services/client";
-
 import { ProductType } from "@/src/types/product.type";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
-
 import { useLocalSearchParams, useRouter } from "expo-router";
-
-
-
-
-
-import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, ActivityIndicator } from "react-native";
-
+import {
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+    ActivityIndicator,
+    ScrollView
+} from "react-native";
 import { useBusiness } from "@/src/context/business.context";
 import StorageController from "@/src/services/storage/controller/storage.controller";
 import React from "react";
-
-
-
 
 const LabeledInput = ({ label, children, ...props }: {
     label: string;
     [key: string]: any;
     children: React.ReactNode
 }) => (
-    <View style={{ 
+    <View style={{
         gap: 5,
         minHeight: 70,
         marginBottom: 10,
@@ -33,12 +34,10 @@ const LabeledInput = ({ label, children, ...props }: {
     </View>
 )
 
-
 export default function ProductPage() {
     const params = useLocalSearchParams();
     const image = React.useMemo<string>(() => params.imageUri as string, []);
     const imageBase64 = React.useMemo<string>(() => params.imageBase64 as string, []);
-
     const { business } = useBusiness();
 
     const [product, setProduct] = React.useState<ProductType>({
@@ -52,13 +51,10 @@ export default function ProductPage() {
     });
 
     const router = useRouter();
-
     const cancelProduct = () => router.back();
-
     const [isLoading, setIsLoading] = React.useState(false);
 
     const validateProduct = (): boolean => {
-        // Check for empty fields
         if (!product.name.trim()) {
             Alert.alert("Error", "El nombre del producto es requerido");
             return false;
@@ -69,13 +65,11 @@ export default function ProductPage() {
             return false;
         }
 
-        // Check if price is a valid number and greater than 0
         if (isNaN(product.price) || product.price <= 0) {
             Alert.alert("Error", "El precio debe ser un número mayor a 0");
             return false;
         }
 
-        // Check if stock is a valid number and not negative
         if (isNaN(product.stock) || product.stock < 0) {
             Alert.alert("Error", "El stock debe ser un número mayor o igual a 0");
             return false;
@@ -112,8 +106,8 @@ export default function ProductPage() {
                 image: uploadedImageUrl
             };
 
-            const response = await productConsumer.consume('POST', { 
-                data: updatedProduct 
+            const response = await productConsumer.consume('POST', {
+                data: updatedProduct
             });
 
             if (response) {
@@ -136,7 +130,6 @@ export default function ProductPage() {
         }
     };
 
-    // Also add input validation on change:
     const handlePriceChange = (text: string) => {
         const number = parseFloat(text);
         if (text === '' || isNaN(number)) {
@@ -156,137 +149,127 @@ export default function ProductPage() {
     };
 
     return (
-        <KeyboardAvoidingView 
-            style={{
-                padding: 5,
-                flex: 1,
-                gap: 10 
-            }}
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            <View style={{
-                width: "100%",
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-            }}>
-                {image && (
-                    <Pressable
-                        style={{
-                            width: 100,
-                            height: 100,
-                            borderRadius: 5,
-                            overflow: 'hidden',
-                            position: 'relative',
-                            marginTop: 20,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
-                        onPress={() => router.back()}
-                    >
-                        <Image
-                            source={{ uri: image }}
-                            style={StyleSheet.absoluteFillObject}
-                        />
-                        <View style={{
-                            ...StyleSheet.absoluteFillObject,
-                            backgroundColor: 'black',
-                            opacity: 0.5,
-                        }} />
-
-                        <FontAwesome6 name="arrows-rotate" size={22} color="white" />
-                    </Pressable>
-                )}
+            <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 10 }}>
                 <View style={{
-                    flex: 1,
-                    gap: 20,
-                    padding: 5,
+                    width: "100%",
+                    flexDirection: 'row',
+                    gap: 10,
+                    alignItems: 'center',
                 }}>
-                    <LabeledInput label="Nombre">
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Nombre"
-                            onChangeText={(text) => setProduct((product) => ({ ...product, name: text }))}
-                        />
-                    </LabeledInput>
-                    <LabeledInput label="Precio">
-                        <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
-                            <FontAwesome name="dollar" size={16} color="black" />
-                            <TextInput
-                                style={{ flex: 1 }}
-                                placeholder="Precio"
-                                keyboardType="numeric"
-                                onChangeText={handlePriceChange}
-                                value={product.price > 0 ? product.price.toString() : ''}
+                    {image && (
+                        <Pressable
+                            style={{
+                                width: 100,
+                                height: 100,
+                                borderRadius: 5,
+                                overflow: 'hidden',
+                                position: 'relative',
+                                marginTop: 20,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                            onPress={() => router.back()}
+                        >
+                            <Image
+                                source={{ uri: image }}
+                                style={StyleSheet.absoluteFillObject}
                             />
-                        </View>
-                    </LabeledInput>
-                    <LabeledInput label="Stock">
-                        <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
-                            <FontAwesome name="dollar" size={16} color="black" />
-                            <TextInput
-                                style={{ flex: 1 }}
-                                placeholder="Stock"
-                                keyboardType="numeric"
-                                onChangeText={handleStockChange}
-                                value={product.stock > 0 ? product.stock.toString() : ''}
-                            />
-                        </View>
-                    </LabeledInput>
-
-                </View>
-            </View>
-
-            <LabeledInput label="Descripción">
-                <TextInput
-                    style={{
-                        ...styles.input,
-                        height: 150,
-                    }}
-
-                    onChangeText={(text) => setProduct((product) => ({ ...product, description: text }))}
-                    placeholder="Descripción"
-                    multiline={true}
-                />
-            </LabeledInput>
-
-            <View style={{
-                gap: 5,
-                marginTop: 'auto',
-                marginBottom: 20
-            }}>
-                <Pressable
-                    style={({ pressed }) => ({
-                        backgroundColor: pressed ? "#333" : "#000",
-                        padding: 14,
-                        borderRadius: 5,
-                        alignItems: "center",
-                        opacity: isLoading ? 0.7 : 1
-                    })}
-                    onPress={saveProduct}
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <ActivityIndicator color="white" />
-                    ) : (
-                        <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
+                            <View style={{
+                                ...StyleSheet.absoluteFillObject,
+                                backgroundColor: 'black',
+                                opacity: 0.5,
+                            }} />
+                            <FontAwesome6 name="arrows-rotate" size={22} color="white" />
+                        </Pressable>
                     )}
-                </Pressable>
+                    <View style={{
+                        flex: 1,
+                        gap: 20,
+                        padding: 5,
+                    }}>
+                        <LabeledInput label="Nombre">
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Nombre"
+                                onChangeText={(text) => setProduct((product) => ({ ...product, name: text }))}
+                            />
+                        </LabeledInput>
+                        <LabeledInput label="Precio">
+                            <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
+                                <FontAwesome name="dollar" size={16} color="black" />
+                                <TextInput
+                                    style={{ flex: 1 }}
+                                    placeholder="Precio"
+                                    keyboardType="numeric"
+                                    onChangeText={handlePriceChange}
+                                    value={product.price > 0 ? product.price.toString() : ''}
+                                />
+                            </View>
+                        </LabeledInput>
+                        <LabeledInput label="Stock">
+                            <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
+                                <FontAwesome name="dollar" size={16} color="black" />
+                                <TextInput
+                                    style={{ flex: 1 }}
+                                    placeholder="Stock"
+                                    keyboardType="numeric"
+                                    onChangeText={handleStockChange}
+                                    value={product.stock > 0 ? product.stock.toString() : ''}
+                                />
+                            </View>
+                        </LabeledInput>
+                    </View>
+                </View>
 
-                <Pressable
-                    style={({ pressed }) => ({
-                        backgroundColor: pressed ? "#F69792" : "#F04A41",
-                        padding: 14,
-                        borderRadius: 5,
-                        alignItems: "center"
-                    })}
-                    onPress={cancelProduct}
-                >
-                    <Text style={{ color: "white", fontSize: 16 }}>Cancelar</Text>
-                </Pressable>
-            </View>
+                <LabeledInput label="Descripción">
+                    <TextInput
+                        style={{
+                            ...styles.input,
+                            height: 150,
+                        }}
+                        onChangeText={(text) => setProduct((product) => ({ ...product, description: text }))}
+                        placeholder="Descripción"
+                        multiline={true}
+                    />
+                </LabeledInput>
+
+                <View style={{ gap: 5, marginBottom: 20 }}>
+                    <Pressable
+                        style={({ pressed }) => ({
+                            backgroundColor: pressed ? "#333" : "#000",
+                            padding: 14,
+                            borderRadius: 5,
+                            alignItems: "center",
+                            opacity: isLoading ? 0.7 : 1
+                        })}
+                        onPress={saveProduct}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
+                        )}
+                    </Pressable>
+
+                    <Pressable
+                        style={({ pressed }) => ({
+                            backgroundColor: pressed ? "#F69792" : "#F04A41",
+                            padding: 14,
+                            borderRadius: 5,
+                            alignItems: "center"
+                        })}
+                        onPress={cancelProduct}
+                    >
+                        <Text style={{ color: "white", fontSize: 16 }}>Cancelar</Text>
+                    </Pressable>
+                </View>
+            </ScrollView>
         </KeyboardAvoidingView>
-
     );
 }
 
