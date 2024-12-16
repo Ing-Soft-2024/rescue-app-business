@@ -44,7 +44,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
     React.useEffect(() => {
         if (!session) return router.replace("/signin");
-        router.replace("/(app)/");
+        router.replace("/(app)");
     }, [session])
 
     return (
@@ -52,19 +52,23 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             session,
             signInWith: async (method, opt?) => {
                 if (!isValidAuthMethod(method)) throw Error("Invalid sign in method");
+                return new Promise((resolve, reject) => {
+                    authMethods[method].signIn(opt)
+                        .then((session) => {
+                            if (!session) return;
+                            setSession(session);
+    
+                            // Save session to secure store, persisting the session
+                            SecureStoreOptions
+                                .setItem("session", JSON.stringify(session));
 
-                authMethods[method].signIn(opt)
-                    .then((session) => {
-                        if (!session) return;
-                        setSession(session);
-
-                        // Save session to secure store, persisting the session
-                        SecureStoreOptions
-                            .setItem("session", JSON.stringify(session));
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                    });
+                            resolve(session);
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            reject(error);
+                        });
+                })
             },
             signOut: () => {
                 if (!session) return;

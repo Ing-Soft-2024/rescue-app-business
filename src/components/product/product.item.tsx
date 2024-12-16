@@ -2,10 +2,11 @@ import StorageController from "@/src/services/storage/controller/storage.control
 import { ProductType } from "@/src/types/product.type";
 import { useFocusEffect } from "expo-router";
 import React from "react";
-import { ActivityIndicator, Image, Text, View } from "react-native";
+import { ActivityIndicator, Image, Text, View, Pressable } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { ProductActions } from "./actions";
+import { router } from "expo-router";
 
 
 
@@ -31,6 +32,20 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
         React.useCallback(() => { processImage(product.image); }, [product.image])
     );
 
+    const handleEditPress = () => {
+        router.push({
+            pathname: './product/edit',
+            params: {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                stock: product.stock,
+                image: product.image,
+                description: product.description
+            }
+        });
+    };
+
     return (
         <GestureHandlerRootView>
             <View style={{
@@ -42,10 +57,28 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
                 borderWidth: 1,
 
                 overflow: "hidden",
+                opacity: product.stock === 0 ? 0.5 : 1,
             }}>
                 <Swipeable
+                    key={`swipe-${product.id}-${Date.now()}`}
                     shouldCancelWhenOutside={false}
-                    renderRightActions={() => <ProductActions id={product.id!} />}
+                    renderRightActions={() => (
+                        <View style={{ flexDirection: 'row' }}>
+                            <Pressable 
+                                onPress={handleEditPress}
+                                style={{
+                                    backgroundColor: '#4CAF50',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    width: 75,
+                                    height: '100%'
+                                }}
+                            >
+                                <Text style={{ color: 'white' }}>Edit</Text>
+                            </Pressable>
+                            <ProductActions id={product.id!} />
+                        </View>
+                    )}
                 >
                     <View style={{
                         flexDirection: "row",
@@ -96,6 +129,13 @@ export const ProductItem = ({ product }: { product: ProductType }) => {
                                     style: "currency",
                                     currency: "ARS"
                                 }).format(product?.price)}
+                            </Text>
+                            <Text style={{
+                                fontSize: 14,
+                                fontWeight: "semibold",
+                                color: "#D8776E"
+                            }}>
+                                Stock: {product?.stock}
                             </Text>
                         </View>
                     </View>

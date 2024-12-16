@@ -13,8 +13,8 @@ export type Session = {
     method: AuthMethods;
 }
 
-type SignInWithCredentials = (method: "Credentials", opts: { email: string, password: string }) => Promise<void>;
-type SignInWithSSO = (method: Exclude<AuthMethods, "Credentials">) => Promise<void>;
+type SignInWithCredentials = (method: "Credentials", opts: { email: string, password: string }) => Promise<Session>;
+type SignInWithSSO = (method: Exclude<AuthMethods, "Credentials">) => Promise<Session>;
 
 type SignInWithType =
     SignInWithSSO

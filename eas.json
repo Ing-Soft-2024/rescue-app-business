@@ -1,7 +1,6 @@
 {
   "cli": {
-    "version": ">= 12.5.1",
-    "appVersionSource": "remote"
+    "version": ">= 11.0.2"
   },
   "build": {
     "development": {
@@ -23,9 +22,7 @@
         "EXPO_PUBLIC_API_URL": "https://varied-laurella-rescue-bafbd5dd.koyeb.app"
       }
     },
-    "production": {
-      "autoIncrement": true
-    }
+    "production": {}
   },
   "submit": {
     "production": {}
