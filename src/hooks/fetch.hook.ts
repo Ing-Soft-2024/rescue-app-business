@@ -12,27 +12,31 @@ export const useClientFetch = ({ consumer, method, options }: {
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState<string>();
 
-    useFocusEffect(React.useCallback(() => {
-        consumer.consume(method, options)
-            .then(setData)
-            .catch((error) => {
-                if (error instanceof ApiException)
-                    return setError(error.message);
-                setError('An unknown error occurred');
-            })
-            .finally(() => setLoading(false));
-    }, [options]));
-
-    const reload = async () => {
+    const fetchData = React.useCallback(async () => {
         setLoading(true);
-        consumer.consume(method, options)
-            .then(setData)
-            .catch((error) => {
-                if (error instanceof ApiException)
-                    return setError(error.message);
+        try {
+            const result = await consumer.consume(method, options);
+            setData(result);
+        } catch (error) {
+            if (error instanceof ApiException) {
+                setError(error.message);
+            } else {
                 setError('An unknown error occurred');
-            })
-            .finally(() => setLoading(false));
-    }
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [consumer, method, JSON.stringify(options)]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchData();
+        }, [fetchData])
+    );
+
+    const reload = () => {
+        fetchData();
+    };
+
     return { data, loading, error, reload };
 };

@@ -15,27 +15,33 @@ export default function ProductPage() {
 
     const { business } = useBusiness();
 
-    const { data, loading, error, reload } = useClientFetch({
+    const params = React.useMemo(() => ({
+        id: 1, // or whatever ID you're using
+        refresh: false // Add this property
+    }), []); // Empty dependency array if ID never changes
+
+    const { data: commerceDetails, loading, error, reload } = useClientFetch({
         consumer: commerceDetailsConsumer,
         method: 'GET',
-        options: { params: { id: 1 } }
+        options: {
+            params
+        }
     });
-    const params = useLocalSearchParams();
 
     useFocusEffect(React.useCallback(() => {
         if (params.refresh) {
             reload();
         }
-    }, [params.refresh]))
+    }, [params.refresh, reload]));
 
-    console.log("31,",data);
+    console.log("31,",commerceDetails);
     console.log("32,",business);
-    console.log("33,",error);
+    
     if (error) return <Text>{error}</Text>;
     return (
         <>
             <FlatList
-                data={data?.products?.sort((a: ProductType, b: ProductType) => {
+                data={commerceDetails?.products?.sort((a: ProductType, b: ProductType) => {
                     return a.createdAt > b.createdAt ? -1 : 1;
                 }) ?? []}
                 renderItem={({ item }) => (<ProductItem product={item} key={item.id} />)}

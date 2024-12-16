@@ -55,6 +55,8 @@ export default function ProductPage() {
 
     const cancelProduct = () => router.back();
 
+    const [loading, setLoading] = React.useState(false);
+
     const saveProduct = async () => {
         try {
             if (!image) {
@@ -64,13 +66,23 @@ export default function ProductPage() {
 
             console.log('Starting product creation with image:', image);
 
-            const uploadedImageUrl = await StorageController.upload(image, imageBase64).catch(error => {
-                console.error('Image upload error:', error);
-                Alert.alert("Error", "Error al procesar la imagen");
-                return null;
-            });
+            // Show loading state
+            setLoading(true);
+
+            const uploadedImageUrl = await StorageController.upload(image, imageBase64)
+                .catch(error => {
+                    console.error('Image upload error:', error);
+                    if (error.response) {
+                        console.error('Error response:', error.response.data);
+                    }
+                    Alert.alert("Error", "Error al procesar la imagen");
+                    return null;
+                });
+
+            console.log("Uploaded image URL:", uploadedImageUrl);
 
             if (!uploadedImageUrl) {
+                setLoading(false);
                 return;
             }
 
@@ -96,6 +108,8 @@ export default function ProductPage() {
                 "Error",
                 "Hubo un error al crear el producto. Por favor, intente nuevamente."
             );
+        } finally {
+            setLoading(false);
         }
     };
 

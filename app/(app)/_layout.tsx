@@ -6,6 +6,7 @@ import { Redirect, useRouter } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import { Pressable } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { NotificationsBell } from "@/src/components/base/notifications.bell";
 
 
 
@@ -47,7 +48,8 @@ export default function AppLayout() {
                     name="index"
                     options={{
                         title: "Mis Productos",
-                        drawerIcon: (props) => <MaterialIcons name="home" {...props} />
+                        drawerIcon: (props) => <MaterialIcons name="home" {...props} />,
+                        headerRight: () => <NotificationsBell />
                     }} />
                 <Drawer.Screen
                     name="notifications/index"
