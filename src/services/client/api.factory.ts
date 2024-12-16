@@ -13,8 +13,10 @@ import { ApiException } from "./api.exception";
  */
 const tryAxios = async (_instance: Axios, config: AxiosRequestConfig) => {
     try {
+        console.log(_instance, config);
         return (await _instance.request(config)).data;
     } catch (error) {
+        console.log(error);
         if (!axios.isAxiosError(error) || !error.response)
             throw new ApiException(500, 'An unknown error occurred');
         throw new ApiException(error.response.status, error.response.data.message);

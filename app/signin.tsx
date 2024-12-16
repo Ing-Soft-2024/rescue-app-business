@@ -27,7 +27,7 @@ export default function AuthLayout() {
         if(!session) return;
 
         const exists = await hasBusiness(session.user.id);
-        if(!exists) return router.push('./create_commerce.tsx');
+        if(!exists) return router.push('/create_commerce');
         router.push('./(screens)/index.tsx');  // lleva al usuario a la pantalla de home (index)
     };
 
