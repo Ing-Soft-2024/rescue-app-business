@@ -32,114 +32,114 @@ export default function AuthLayout() {
     };
 
     const navigateToRegister = () => {
-        router.push('./(screens)/create_commerce.tsx');  // lleva al usuario a la pantalla de home (index)
+        router.push('./register');  // lleva al usuario a la pantalla de home (index)
     };
 
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{
-                flexDirection: 'column',
-                flex: 1,
-                justifyContent: 'center',
-                gap: 10,
-                backgroundColor: '#fafafa',
-                padding: 10,
-            }}
-        >
-            <View style={styles.container}>
-                <Image
-                    source={require('../assets/images/reskue-logo.png')}
-                    style={styles.logoContainer}
-                />
-
-                <Text style={styles.appName}>
-                    reskue
-                </Text>
-            </View>
-
-            <View style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10,
-                marginTop: 20,
-            }}>
-                <TextInput
-                    placeholder="Email"
-                    style={{
-                        backgroundColor: 'white',
-                        padding: 10,
-                        borderRadius: 5,
-                        fontSize: 18,
-                        shadowColor: 'black',
-                        shadowOpacity: 0.1,
-                        shadowOffset: { width: 0, height: 1 },
-                    }}
-
-                    onChangeText={setEmail}
-                    value={email}
-                />
-                <TextInput
-                    placeholder="Password"
-                    style={{
-                        backgroundColor: 'white',
-                        padding: 10,
-                        borderRadius: 5,
-                        fontSize: 18,
-                        shadowColor: 'black',
-                        shadowOpacity: 0.1,
-                        shadowOffset: { width: 0, height: 1 },
-                    }}
-                    textContentType="password"
-                    secureTextEntry={true}
-
-                    onChangeText={setPassword}
-                    value={password}
-                />
-
-                <Pressable style={styles.button} onPress={() => signInWithCredentials()}>
-                    <Text style={styles.buttonText}>Iniciar sesión</Text>
-                </Pressable>
-                <View>
-                    <Text style={{
-                        color: '#444444',
-                        fontSize: 12,
-                    }}>
-                        Al iniciar sesión, estarás aceptando los Términos y Condiciones de uso.
-                    </Text>
-                </View>
-            </View>
-
-
-            <Pressable
-                style={({ pressed }) => ({
-                    marginTop: 1,
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={{
+                    flexDirection: 'column',
+                    flex: 1,
+                    justifyContent: 'center',
+                    gap: 10,
+                    backgroundColor: '#fafafa',
                     padding: 10,
-                    alignItems: 'center',
-                    borderRadius: 5,
-                    backgroundColor: pressed ? "#ddd" : "#fafafa",
-                })}
-                onPress={navigateToRegister}
+                }}
             >
-                <Text style={{
-                    color: "#8D6E63",
-                    fontSize: 16,
-                    paddingTop: 10,
-                    paddingBottom: 10
-                }}>
-                    Registrarse
-                </Text>
-            </Pressable>
-            {/* <View style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                gap: 5,
-                marginTop: 40,
-            }}>
-                <GoogleComponent />
-                <AppleIDButton />
-            </View> */}
+                    <View style={styles.container}>
+                        <Image
+                            source={require('../assets/images/reskue-logo.png')}
+                            style={styles.logoContainer}
+                        />
+
+                        <Text style={styles.appName}>
+                            reskue
+                        </Text>
+                    </View>
+
+                    <View style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                        marginTop: 20,
+                    }}>
+                        <TextInput
+                            placeholder="Email"
+                            style={{
+                                backgroundColor: 'white',
+                                padding: 10,
+                                borderRadius: 5,
+                                fontSize: 18,
+                                shadowColor: 'black',
+                                shadowOpacity: 0.1,
+                                shadowOffset: { width: 0, height: 1 },
+                            }}
+
+                            onChangeText={setEmail}
+                            value={email}
+                        />
+                        <TextInput
+                            placeholder="Password"
+                            style={{
+                                backgroundColor: 'white',
+                                padding: 10,
+                                borderRadius: 5,
+                                fontSize: 18,
+                                shadowColor: 'black',
+                                shadowOpacity: 0.1,
+                                shadowOffset: { width: 0, height: 1 },
+                            }}
+                            textContentType="password"
+                            secureTextEntry={true}
+
+                            onChangeText={setPassword}
+                            value={password}
+                        />
+
+                        <Pressable style={styles.button} onPress={() => signInWithCredentials()}>
+                            <Text style={styles.buttonText}>Iniciar sesión</Text>
+                        </Pressable>
+                        <View>
+                            <Text style={{
+                                color: '#444444',
+                                fontSize: 12,
+                            }}>
+                                Al iniciar sesión, estarás aceptando los Términos y Condiciones de uso.
+                            </Text>
+                        </View>
+                    </View>
+
+
+                    <Pressable
+                        style={({ pressed }) => ({
+                            marginTop: 1,
+                            padding: 10,
+                            alignItems: 'center',
+                            borderRadius: 5,
+                            backgroundColor: pressed ? "#ddd" : "#fafafa",
+                        })}
+                        onPress={navigateToRegister}
+                    >
+                        <Text style={{
+                            color: "#8D6E63",
+                            fontSize: 16,
+                            paddingTop: 10,
+                            paddingBottom: 10
+                        }}>
+                            Registrarse
+                        </Text>
+                    </Pressable>
+                    {/* <View style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        gap: 5,
+                        marginTop: 40,
+                    }}>
+                        <GoogleComponent />
+                        <AppleIDButton />
+                    </View> */}
         </KeyboardAvoidingView>
     )
 }
