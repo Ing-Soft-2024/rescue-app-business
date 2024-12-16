@@ -16,7 +16,6 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.tjuhasz.rescueapp-bussiness",
-      "googleServicesFile": "./GoogleService-Info.plist",
       "usesAppleSignIn": true,
       "config": {
         "usesNonExemptEncryption": false
@@ -27,7 +26,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "googleServicesFile": "./google-services.json",
       "package": "com.tjuhasz.rescueappbussiness",
       "permissions": [
         "android.permission.CAMERA",
