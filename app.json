@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "rescueapp-bussiness",
+    "name": "myapp",
     "slug": "rescueapp-bussiness",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/reskue-logo.png",
-    "scheme": "rescueapp-bussiness",
+    "scheme": "myapp",
     "owner": "rescue",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.tjuhasz.rescueapp-bussiness",
+      "bundleIdentifier": "com.tjuhasz.myapp",
       "googleServicesFile": "./GoogleService-Info.plist",
       "usesAppleSignIn": true,
       "config": {
@@ -28,7 +28,7 @@
         "backgroundColor": "#ffffff"
       },
       "googleServicesFile": "./google-services.json",
-      "package": "com.tjuhasz.rescueappbussiness",
+      "package": "com.tjuhasz.myapp",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
