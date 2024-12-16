@@ -59,3 +59,8 @@ export const loginConsumer = apiConsumerFactory({
     endpoint: 'auth/login',
     validEndpoints: ['POST']
 });
+
+export const userBusinessConsumer = apiConsumerFactory({
+    endpoint: 'user/business',
+    validEndpoints: ['GET']
+});

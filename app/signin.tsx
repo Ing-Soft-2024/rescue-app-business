@@ -1,15 +1,28 @@
-import { useSession } from '@/src/context/session.context';
+import { userBusinessConsumer } from '@/src/services/client';
 import { useRouter } from 'expo-router';
 import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function AuthLayout() {
-    const { signInWith } = useSession();
+    // const { session } = useSession();
     const router = useRouter();
 
-    const navigateToIndex = () => {
-        const checkIfHasBusiness = async () => {
-            
-        }
+
+    const hasBusiness = async () => {
+        const response = await userBusinessConsumer.consume('GET', {
+            data: {
+                "userId": 1
+            }
+        });
+    }
+
+    const navigateToIndex = ({
+        
+    }: {
+
+    }) => {
+        
+        hasBusiness();
+
         router.push('./(screens)/index.tsx');  // lleva al usuario a la pantalla de home (index)
     };
 
@@ -20,13 +33,11 @@ export default function AuthLayout() {
                 flexDirection: 'column',
                 flex: 1,
                 justifyContent: 'center',
-                // alignItems: 'center',
                 gap: 10,
                 backgroundColor: '#fafafa',
                 padding: 10,
             }}
         >
-
             <View style={styles.container}>
                 <Image
                     source={require('../assets/images/reskue-logo.png')}
@@ -56,7 +67,6 @@ export default function AuthLayout() {
                         shadowOffset: { width: 0, height: 1 },
                     }}
                 />
-
                 <TextInput
                     placeholder="Password"
                     style={{
@@ -91,10 +101,10 @@ export default function AuthLayout() {
                 backgroundColor: '#70D294',
                 borderColor: '#70D294',
             }} onPress={() => { }}>
-                    <Text style={{
-                        ...styles.buttonText,
-                        color: '#472E2E',
-                    }}>Registrarse</Text>
+                <Text style={{
+                    ...styles.buttonText,
+                    color: '#472E2E',
+                }}>Registrarse</Text>
             </Pressable>
             {/* <View style={{
                 display: 'flex',
