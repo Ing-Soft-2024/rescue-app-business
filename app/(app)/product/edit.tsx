@@ -4,7 +4,7 @@ import { ProductType } from "@/src/types/product.type";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, ActivityIndicator } from "react-native";
 
 const LabeledInput = ({ label, children }: {
     label: string;
@@ -84,11 +84,15 @@ export default function EditProductPage() {
         }
     };
 
+    const [isLoading, setIsLoading] = React.useState(false);
+
     const saveProduct = async () => {
         try {
             if (!validateProduct()) {
                 return;
             }
+
+            setIsLoading(true);
 
             await productDetailsConsumer.consume('POST', {
                 params: { id: product.id },
@@ -105,6 +109,8 @@ export default function EditProductPage() {
                 "Error",
                 "Hubo un error al guardar el producto. Por favor, intente nuevamente."
             );
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -171,7 +177,7 @@ export default function EditProductPage() {
                     </LabeledInput>
                     <LabeledInput label="Stock">
                         <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
-                            <FontAwesome name="dollar" size={16} color="black" />
+                            <FontAwesome name="cubes" size={16} color="black" />
                             <TextInput
                                 style={{ flex: 1 }}
                                 placeholder="Stock"
@@ -197,17 +203,27 @@ export default function EditProductPage() {
                 />
             </LabeledInput>
 
-            <View style={{ gap: 5, marginTop: 'auto', marginBottom: 20 }}>
+            <View style={{ 
+                gap: 5, 
+                marginTop: 'auto',
+                marginBottom: 20 
+            }}>
                 <Pressable
                     style={({ pressed }) => ({
                         backgroundColor: pressed ? "#333" : "#000",
                         padding: 14,
                         borderRadius: 5,
-                        alignItems: "center"
+                        alignItems: "center",
+                        opacity: isLoading ? 0.7 : 1
                     })}
                     onPress={saveProduct}
+                    disabled={isLoading}
                 >
-                    <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
+                    {isLoading ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
+                    )}
                 </Pressable>
 
                 <Pressable
