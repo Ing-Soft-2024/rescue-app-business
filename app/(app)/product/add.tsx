@@ -1,45 +1,30 @@
 import { productConsumer } from "@/src/services/client";
 import { ProductType } from "@/src/types/product.type";
-import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import React from "react";
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
     View,
+    TextInput,
+    Text,
+    Pressable,
+    Alert,
     ActivityIndicator,
-    ScrollView
+    StyleSheet,
 } from "react-native";
 import { useBusiness } from "@/src/context/business.context";
 import StorageController from "@/src/services/storage/controller/storage.controller";
-import React from "react";
-
-const LabeledInput = ({ label, children, ...props }: {
-    label: string;
-    [key: string]: any;
-    children: React.ReactNode
-}) => (
-    <View style={{
-        gap: 5,
-        minHeight: 70,
-        marginBottom: 10,
-    }}>
-        <Text style={styles.label}>{label}</Text>
-        {children}
-    </View>
-)
 
 export default function ProductPage() {
+    const router = useRouter();
     const params = useLocalSearchParams();
-    const image = React.useMemo<string>(() => params.imageUri as string, []);
-    const imageBase64 = React.useMemo<string>(() => params.imageBase64 as string, []);
     const { business } = useBusiness();
+    const [isLoading, setIsLoading] = React.useState(false);
 
+    // Get image from params
+    const image = params.imageUri as string;
+    const imageBase64 = params.imageBase64 as string;
+
+    // Basic product state
     const [product, setProduct] = React.useState<ProductType>({
         name: '',
         description: '',
@@ -50,246 +35,148 @@ export default function ProductPage() {
         createdAt: new Date()
     });
 
-    const router = useRouter();
-    const cancelProduct = () => router.back();
-    const [isLoading, setIsLoading] = React.useState(false);
-
-    const validateProduct = (): boolean => {
+    // Basic validation
+    const validateProduct = () => {
         if (!product.name.trim()) {
-            Alert.alert("Error", "El nombre del producto es requerido");
+            Alert.alert("Error", "El nombre es requerido");
             return false;
         }
-
         if (!product.description.trim()) {
-            Alert.alert("Error", "La descripción del producto es requerida");
+            Alert.alert("Error", "La descripción es requerida");
             return false;
         }
-
-        if (isNaN(product.price) || product.price <= 0) {
-            Alert.alert("Error", "El precio debe ser un número mayor a 0");
+        if (product.price <= 0) {
+            Alert.alert("Error", "El precio debe ser mayor a 0");
             return false;
         }
-
-        if (isNaN(product.stock) || product.stock < 0) {
-            Alert.alert("Error", "El stock debe ser un número mayor o igual a 0");
+        if (product.stock < 0) {
+            Alert.alert("Error", "El stock no puede ser negativo");
             return false;
         }
-
+        if (!image) {
+            Alert.alert("Error", "La imagen es requerida");
+            return false;
+        }
         return true;
     };
 
-    const saveProduct = async () => {
+    // Save product
+    const handleSave = async () => {
+        if (!validateProduct()) return;
+
+        setIsLoading(true);
         try {
-            if (!validateProduct()) {
-                return;
-            }
-
-            if (!image) {
-                Alert.alert("Error", "Por favor, seleccione una imagen");
-                return;
-            }
-
-            setIsLoading(true);
-            const uploadedImageUrl = await StorageController.upload(image, imageBase64)
-                .catch(error => {
-                    console.error('Image upload error:', error);
-                    Alert.alert("Error", "Error al procesar la imagen");
-                    return null;
-                });
-
+            // Upload image
+            const uploadedImageUrl = await StorageController.upload(image, imageBase64);
             if (!uploadedImageUrl) {
+                Alert.alert("Error", "Error al subir la imagen");
                 return;
             }
 
-            const updatedProduct = {
-                ...product,
-                image: uploadedImageUrl
-            };
-
+            // Save product
             const response = await productConsumer.consume('POST', {
-                data: updatedProduct
+                data: { ...product, image: uploadedImageUrl }
             });
 
             if (response) {
-                Alert.alert(
-                    "Éxito",
-                    "Producto creado exitosamente",
-                    [{ text: "OK", onPress: () => router.dismissAll() }]
-                );
-            } else {
-                Alert.alert("Error", "Error al crear el producto");
+                Alert.alert("Éxito", "Producto guardado", [
+                    { text: "OK", onPress: () => router.dismissAll() }
+                ]);
             }
         } catch (error) {
-            console.error('Error creating product:', error);
-            Alert.alert(
-                "Error",
-                "Hubo un error al crear el producto. Por favor, intente nuevamente."
-            );
+            console.error(error);
+            Alert.alert("Error", "Error al guardar el producto");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handlePriceChange = (text: string) => {
-        const number = parseFloat(text);
-        if (text === '' || isNaN(number)) {
-            setProduct(prev => ({ ...prev, price: 0 }));
-        } else {
-            setProduct(prev => ({ ...prev, price: number }));
-        }
-    };
-
-    const handleStockChange = (text: string) => {
-        const number = parseInt(text, 10);
-        if (text === '' || isNaN(number)) {
-            setProduct(prev => ({ ...prev, stock: 0 }));
-        } else {
-            setProduct(prev => ({ ...prev, stock: number }));
-        }
-    };
-
     return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-            <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 10 }}>
-                <View style={{
-                    width: "100%",
-                    flexDirection: 'row',
-                    gap: 10,
-                    alignItems: 'center',
-                }}>
-                    {image && (
-                        <Pressable
-                            style={{
-                                width: 100,
-                                height: 100,
-                                borderRadius: 5,
-                                overflow: 'hidden',
-                                position: 'relative',
-                                marginTop: 20,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                            }}
-                            onPress={() => router.back()}
-                        >
-                            <Image
-                                source={{ uri: image }}
-                                style={StyleSheet.absoluteFillObject}
-                            />
-                            <View style={{
-                                ...StyleSheet.absoluteFillObject,
-                                backgroundColor: 'black',
-                                opacity: 0.5,
-                            }} />
-                            <FontAwesome6 name="arrows-rotate" size={22} color="white" />
-                        </Pressable>
-                    )}
-                    <View style={{
-                        flex: 1,
-                        gap: 20,
-                        padding: 5,
-                    }}>
-                        <LabeledInput label="Nombre">
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Nombre"
-                                onChangeText={(text) => setProduct((product) => ({ ...product, name: text }))}
-                            />
-                        </LabeledInput>
-                        <LabeledInput label="Precio">
-                            <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
-                                <FontAwesome name="dollar" size={16} color="black" />
-                                <TextInput
-                                    style={{ flex: 1 }}
-                                    placeholder="Precio"
-                                    keyboardType="numeric"
-                                    onChangeText={handlePriceChange}
-                                    value={product.price > 0 ? product.price.toString() : ''}
-                                />
-                            </View>
-                        </LabeledInput>
-                        <LabeledInput label="Stock">
-                            <View style={{ ...styles.input, flexDirection: "row", gap: 5 }}>
-                                <FontAwesome name="dollar" size={16} color="black" />
-                                <TextInput
-                                    style={{ flex: 1 }}
-                                    placeholder="Stock"
-                                    keyboardType="numeric"
-                                    onChangeText={handleStockChange}
-                                    value={product.stock > 0 ? product.stock.toString() : ''}
-                                />
-                            </View>
-                        </LabeledInput>
-                    </View>
-                </View>
+        <View style={styles.container}>
+            <TextInput
+                style={styles.input}
+                placeholder="Nombre"
+                value={product.name}
+                onChangeText={text => setProduct(prev => ({ ...prev, name: text }))}
+            />
 
-                <LabeledInput label="Descripción">
-                    <TextInput
-                        style={{
-                            ...styles.input,
-                            height: 150,
-                        }}
-                        onChangeText={(text) => setProduct((product) => ({ ...product, description: text }))}
-                        placeholder="Descripción"
-                        multiline={true}
-                    />
-                </LabeledInput>
+            <TextInput
+                style={styles.input}
+                placeholder="Descripción"
+                value={product.description}
+                onChangeText={text => setProduct(prev => ({ ...prev, description: text }))}
+                multiline
+            />
 
-                <View style={{ gap: 5, marginBottom: 20 }}>
-                    <Pressable
-                        style={({ pressed }) => ({
-                            backgroundColor: pressed ? "#333" : "#000",
-                            padding: 14,
-                            borderRadius: 5,
-                            alignItems: "center",
-                            opacity: isLoading ? 0.7 : 1
-                        })}
-                        onPress={saveProduct}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color="white" />
-                        ) : (
-                            <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
-                        )}
-                    </Pressable>
+            <TextInput
+                style={styles.input}
+                placeholder="Precio"
+                value={product.price > 0 ? String(product.price) : ''}
+                onChangeText={text => {
+                    const number = parseFloat(text);
+                    setProduct(prev => ({ ...prev, price: isNaN(number) ? 0 : number }));
+                }}
+                keyboardType="numeric"
+            />
 
-                    <Pressable
-                        style={({ pressed }) => ({
-                            backgroundColor: pressed ? "#F69792" : "#F04A41",
-                            padding: 14,
-                            borderRadius: 5,
-                            alignItems: "center"
-                        })}
-                        onPress={cancelProduct}
-                    >
-                        <Text style={{ color: "white", fontSize: 16 }}>Cancelar</Text>
-                    </Pressable>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
+            <TextInput
+                style={styles.input}
+                placeholder="Stock"
+                value={product.stock > 0 ? String(product.stock) : ''}
+                onChangeText={text => {
+                    const number = parseInt(text);
+                    setProduct(prev => ({ ...prev, stock: isNaN(number) ? 0 : number }));
+                }}
+                keyboardType="numeric"
+            />
+
+            <Pressable
+                style={styles.button}
+                onPress={handleSave}
+                disabled={isLoading}
+            >
+                {isLoading ? (
+                    <ActivityIndicator color="white" />
+                ) : (
+                    <Text style={styles.buttonText}>Guardar</Text>
+                )}
+            </Pressable>
+
+            <Pressable
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => router.back()}
+            >
+                <Text style={styles.buttonText}>Cancelar</Text>
+            </Pressable>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: 'white',
+    },
     input: {
-        backgroundColor: "#f9f9f9",
-        padding: 10,
-        minHeight: 40,
-        borderRadius: 5,
         borderWidth: 1,
-        borderColor: "#ccc",
+        borderColor: '#ddd',
+        padding: 10,
+        marginBottom: 10,
+        borderRadius: 5,
     },
-    label: {
-        fontSize: 14,
-        fontWeight: "semibold",
-        marginBottom: 5,
+    button: {
+        backgroundColor: 'black',
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginTop: 10,
     },
-    image: {
-        width: 200,
-        height: 200,
-        marginTop: 20,
-    }
+    cancelButton: {
+        backgroundColor: '#F04A41',
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+    },
 });
