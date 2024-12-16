@@ -218,7 +218,7 @@ export default function RegisterScreen() {
                     <Text style={styles.loginLink}>Volver</Text>
                 </Pressable>
 
-                <ConnectCommerce redirect_uri='https://kepleris.com/mercadopago-auth' />
+                {/* <ConnectCommerce redirect_uri='https://varied-laurella-rescue-bafbd5dd.koyeb.app/api/auth/mercadopago' /> */}
             </KeyboardAvoidingView>
         </ScrollView>
     );

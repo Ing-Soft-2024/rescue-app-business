@@ -77,11 +77,7 @@ async function openAuthSession({ appId, redirectUri }: AuthParams) {
 
     const result = await openAuthSessionAsync(
       authUrl,
-      redirectUri,
-      {
-        showInRecents: true,
-        
-      }
+      "rescueappbussiness://create_commerce"
     );
 
     if (result.type !== 'success') {
