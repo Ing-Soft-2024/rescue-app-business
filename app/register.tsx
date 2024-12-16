@@ -36,8 +36,7 @@ export default function RegisterScreen() {
                     state
                 }
             });
-            console.log('Registration successful:', response);
-            // router.push('/login-screen'); // Redirect to login after successful registration
+            router.push('/signin'); // Redirect to login after successful registration
         } catch (error) {
             console.error('Registration error:', error);
             // Handle registration error (show message to user)

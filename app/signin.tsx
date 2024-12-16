@@ -1,23 +1,38 @@
+import { useSession } from '@/src/context/session.context';
 import { userBusinessConsumer } from '@/src/services/client';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function AuthLayout() {
-    // const { session } = useSession();
+    const { signInWith } = useSession();
     const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-
-    const hasBusiness = async () => {
+    const hasBusiness = async (userId: number): Promise<Boolean> => {
         const response = await userBusinessConsumer.consume('GET', {
             data: {
-                "userId": 1
+                userId
             }
-        });
+        }).catch((err) => false); 
+        return Boolean(response);
     }
 
-    const navigateToIndex = () => {
-        
+    const signInWithCredentials = async () => {        
+        const session = await signInWith("Credentials", {
+            email: email,
+            password: password
+        }).catch((err) => console.error(err));
+        if(!session) return;
+
+        const exists = await hasBusiness(session.user.id);
+        if(!exists) return router.push('./create_commerce.tsx');
         router.push('./(screens)/index.tsx');  // lleva al usuario a la pantalla de home (index)
+    };
+
+    const navigateToRegister = () => {
+        router.push('./(screens)/create_commerce.tsx');  // lleva al usuario a la pantalla de home (index)
     };
 
     return (
@@ -60,6 +75,9 @@ export default function AuthLayout() {
                         shadowOpacity: 0.1,
                         shadowOffset: { width: 0, height: 1 },
                     }}
+
+                    onChangeText={setEmail}
+                    value={email}
                 />
                 <TextInput
                     placeholder="Password"
@@ -74,9 +92,12 @@ export default function AuthLayout() {
                     }}
                     textContentType="password"
                     secureTextEntry={true}
+
+                    onChangeText={setPassword}
+                    value={password}
                 />
 
-                <Pressable style={styles.button} onPress={() => navigateToIndex()}>
+                <Pressable style={styles.button} onPress={() => signInWithCredentials()}>
                     <Text style={styles.buttonText}>Iniciar sesión</Text>
                 </Pressable>
                 <View>
@@ -90,15 +111,24 @@ export default function AuthLayout() {
             </View>
 
 
-            <Pressable style={{
-                ...styles.button,
-                backgroundColor: '#70D294',
-                borderColor: '#70D294',
-            }} onPress={() => { }}>
+            <Pressable
+                style={({ pressed }) => ({
+                    marginTop: 1,
+                    padding: 10,
+                    alignItems: 'center',
+                    borderRadius: 5,
+                    backgroundColor: pressed ? "#ddd" : "#fafafa",
+                })}
+                onPress={navigateToRegister}
+            >
                 <Text style={{
-                    ...styles.buttonText,
-                    color: '#472E2E',
-                }}>Registrarse</Text>
+                    color: "#8D6E63",
+                    fontSize: 16,
+                    paddingTop: 10,
+                    paddingBottom: 10
+                }}>
+                    Registrarse
+                </Text>
             </Pressable>
             {/* <View style={{
                 display: 'flex',
