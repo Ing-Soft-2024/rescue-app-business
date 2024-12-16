@@ -2,7 +2,7 @@ import { orderDetailsConsumer } from "@/src/services/client";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import { ProductItem } from "./components/productItem";
+import { ProductItem } from "../../../src/components/productItem";
 
 export default function ScannedOrderPage() {
     const param = useLocalSearchParams();
