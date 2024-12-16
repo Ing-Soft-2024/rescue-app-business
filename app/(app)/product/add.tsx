@@ -9,7 +9,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 
 
-import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { useBusiness } from "@/src/context/business.context";
 import StorageController from "@/src/services/storage/controller/storage.controller";
@@ -37,6 +37,7 @@ const LabeledInput = ({ label, children, ...props }: {
 export default function ProductPage() {
     const params = useLocalSearchParams();
     const image = React.useMemo<string>(() => params.imageUri as string, []);
+    const imageBase64 = React.useMemo<string>(() => params.imageBase64 as string, []);
 
     const { business } = useBusiness();
 
@@ -54,14 +55,48 @@ export default function ProductPage() {
 
     const cancelProduct = () => router.back();
 
-    const saveProduct = () => {
-        if (!image) return;
-        StorageController.upload(image!)
-            .then((image) => {
-                if (!image) return;
-                product.image = image;
-                return productConsumer.consume('POST', { data: product });
-            }).then(() => router.dismissAll())
+    const saveProduct = async () => {
+        try {
+            if (!image) {
+                Alert.alert("Error", "Por favor, seleccione una imagen");
+                return;
+            }
+
+            console.log('Starting product creation with image:', image);
+
+            const uploadedImageUrl = await StorageController.upload(image, imageBase64).catch(error => {
+                console.error('Image upload error:', error);
+                Alert.alert("Error", "Error al procesar la imagen");
+                return null;
+            });
+
+            if (!uploadedImageUrl) {
+                return;
+            }
+
+            const updatedProduct = {
+                ...product,
+                image: uploadedImageUrl
+            };
+
+            console.log('Sending product data:', updatedProduct);
+
+            const response = await productConsumer.consume('POST', { 
+                data: updatedProduct 
+            });
+
+            if (response) {
+                router.dismissAll();
+            } else {
+                Alert.alert("Error", "Error al crear el producto");
+            }
+        } catch (error) {
+            console.error('Error creating product:', error);
+            Alert.alert(
+                "Error",
+                "Hubo un error al crear el producto. Por favor, intente nuevamente."
+            );
+        }
     };
 
     return (

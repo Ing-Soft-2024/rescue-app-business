@@ -59,7 +59,7 @@ export default function RegisterScreen() {
                     state: state.trim()
                 }
             });
-            router.push('./(app)/index');
+            router.push('./(app)/');
         } catch (error) {
             console.error('Error al crear comercio:', error);
             Alert.alert(

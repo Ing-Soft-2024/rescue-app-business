@@ -2,6 +2,7 @@ import { useFocusEffect } from "expo-router";
 import React from "react";
 import { getMyBusiness } from "../services/commerce/commerce";
 import { Business } from "../types/business.type";
+import { useSession } from "./session.context";
 
 type BusinessContextType = {
     business: Business | undefined,
@@ -17,13 +18,15 @@ export const useBusiness = () => {
 
 export const BusinessProvider = ({ children }: { children: React.ReactNode }) => {
     const [business, setBusiness] = React.useState<Business>();
+    const { session } = useSession();
     
     useFocusEffect(React.useCallback(() => {
-        getMyBusiness(1).then(setBusiness).catch(console.error);
+        if (!session?.user.id) return;
+        getMyBusiness(session?.user.id).then(setBusiness).catch(console.error);
         return () => {
             setBusiness(undefined);
         }
-    }, []));
+    }, [session]));
     // React.useEffect(() => {
     //     getMyBusiness(1).then(setBusiness);
     // }, []);

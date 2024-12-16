@@ -1,12 +1,5 @@
 import { storageConsumer } from "@/src/services/client";
-
 import * as FileSystem from "expo-file-system";
-
-
-import { base64ToFile, fileToBase64, convertFileToBase64 } from "../utils/base64";
-import { eliminarDiacriticos } from "../utils/eliminarDiacriticos"
-
-const baseAPI = process.env['NEXT_PUBLIC_API_URL'] + '/api';
 
 class StorageError extends Error {
     constructor(message: string) {
@@ -14,46 +7,54 @@ class StorageError extends Error {
         this.name = 'StorageError';
     }
 }
+
 export default class StorageController {
-    static upload = async (file: string, pathTo?: string): Promise<string | undefined> => {
-
-        let fileName = file?.split('/').pop();
-        if (!fileName || !file) return undefined;
-        const base64 = await FileSystem.readAsStringAsync(file, { encoding: FileSystem.EncodingType.Base64 });
-
-        // if (!FileSystem) return undefined;
-        // const base64File = await FileSystem.readAsStringAsync(file, { encoding: FileSystem.EncodingType.Base64 });
-        // console.log(base64File);
-        const parts = fileName.split('.');
-        if (parts.length >= 2) {
-            const ext = parts[parts.length - 1];
-            parts.pop();
-            fileName = parts.join('_');
-            fileName += `.${ext}`;
-            fileName = fileName.replace(/\s/g, '_');
-            fileName = eliminarDiacriticos(fileName);
-        }
-        fileName = pathTo ? `${pathTo}/${fileName}` : fileName;
+    static async upload(source: string, base64Data?: string): Promise<string | null> {
         try {
-            return storageConsumer.consume("POST", {
-                "data": {
-                    "fileName": fileName,
-                    "file": base64
+            console.log('Starting upload for source');
+            
+            let finalBase64: string;
+            
+            if (base64Data) {
+                // Use the provided base64 data directly
+                finalBase64 = base64Data;
+            } else if (source.startsWith('data:image')) {
+                finalBase64 = source.split(',')[1];
+            } else {
+                // For other cases (like gallery picks), try to read the file
+                try {
+                    finalBase64 = await FileSystem.readAsStringAsync(source, {
+                        encoding: FileSystem.EncodingType.Base64
+                    });
+                } catch (error) {
+                    console.error('Error reading file:', error);
+                    throw new StorageError('Unable to read image file');
+                }
+            }
 
+            // Upload the base64 string to your server
+            const response = await storageConsumer.consume('POST', {
+                data: {
+                    file: finalBase64,
+                    fileName: source.split('/').pop() || 'image.jpg'
                 }
             });
-        } catch {
-            throw new StorageError('Hubo un error al subir el archivo');
+
+            return response?.fileName || null;
+
+        } catch (error) {
+            console.error('Error in upload:', error);
+            throw error;
         }
     }
 
     static download = async (fileName: string): Promise<string> => {
         if (!fileName) throw new StorageError('No file name Provided');
         const base64File = await storageConsumer.consume("GET", {
-            "queryParams": {
-                "fileName": fileName
+            queryParams: {
+                fileName: fileName
             }
-        })
+        });
         return `data:image/png;base64,${base64File}`;
     }
 }

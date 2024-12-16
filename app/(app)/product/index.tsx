@@ -20,28 +20,31 @@ export default function AddProduct() {
         setIsLoading(true);
         try {
             const result = await takePhoto();
-            if(result) setImages(result.uri);
-            nextStep();
+            if (result) {
+                setImages(result.uri);
+                router.push({
+                    pathname: "/product/add",
+                    params: {
+                        imageUri: result.uri,
+                        imageBase64: result.base64
+                    }
+                });
+            }
         } catch (error) {
             console.error(error);
         } finally {
             setIsLoading(false);
         }
     }
+
     const takePhoto = async () => {
         if (!cameraRef.current) return;
-        return await cameraRef.current.takePictureAsync();
-    }
-
-    const nextStep = () => {
-        if (!image) return;
-
-        router.push({
-            "pathname": "/product/add",
-            "params": {
-                "imageUri": image
-            }
+        const photo = await cameraRef.current.takePictureAsync({
+            base64: true,
+            quality: 0.7,
+            exif: false
         });
+        return photo;
     }
 
     return (
@@ -191,7 +194,7 @@ export default function AddProduct() {
                         flexDirection: 'row',
                         opacity: image ? 1 : 0.25,
                     })}
-                        onPress={nextStep}
+                        onPress={wrapTakePhoto}
                     >
                         <AntDesign
                             name="arrowright"

@@ -13,7 +13,6 @@ export const useClientFetch = ({ consumer, method, options }: {
     const [error, setError] = React.useState<string>();
 
     useFocusEffect(React.useCallback(() => {
-        if (loading || error) return;
         consumer.consume(method, options)
             .then(setData)
             .catch((error) => {

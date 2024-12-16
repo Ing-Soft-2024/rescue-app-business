@@ -30,7 +30,7 @@ export type ApiRequestConfig = Exclude<AxiosRequestConfig, "method" | "url"> & {
 
 export class ApiConsumerFactory<ValidMethods extends string> {
     _axios: Axios;
-    _endpoint: string;
+    _baseEndpoint: string;
     _validEndpoints?: ValidMethods[];
     static baseURL = process.env['EXPO_PUBLIC_API_URL'];
 
@@ -38,9 +38,14 @@ export class ApiConsumerFactory<ValidMethods extends string> {
         endpoint: string,
         validEndpoints?: ValidMethods[]
     }) {
-        this._axios = axios.create({ baseURL: ApiConsumerFactory.baseURL, headers: { 'Content-Type': 'application/json' } });
-        this._endpoint = `${ApiConsumerFactory.baseURL}/api/${endpoint}`;
+        this._axios = axios.create({ 
+            baseURL: ApiConsumerFactory.baseURL, 
+            headers: { 'Content-Type': 'application/json' } 
+        });
+        this._baseEndpoint = endpoint;
         this._validEndpoints = validEndpoints?.map(method => method.toUpperCase() as ValidMethods);
+        console.log('Constructor - Base URL:', ApiConsumerFactory.baseURL);
+        console.log('Constructor - Endpoint:', endpoint);
     }
 
     /**
@@ -49,25 +54,6 @@ export class ApiConsumerFactory<ValidMethods extends string> {
      * @returns 
      */
     private _querySerializer = (query?: { [key: string]: any }) => query ? `?${Object.entries(query).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&')}` : '';
-
-    private _replaceParams = (endpoint: string, params?: { [key: string]: any }) => {
-        const regex = /{(\w+)}/g;
-        const match = endpoint.match(regex);
-        if (!match) return endpoint;
-
-
-        let toReplace = endpoint;
-        match.forEach((m, i) => {
-            const regex = /(\w+)/;
-            const paramName = match.groups?.[i] ?? m.match(regex)?.[0] ?? m;
-
-            const paramValue = params?.[paramName];
-            if (!paramValue) throw new ApiException(400, `Parameter ${paramName} is required`);
-            toReplace = toReplace.replace(m, paramValue);
-        });
-
-        return toReplace;
-    }
 
     /**
      * Consume the API with the provided method and data
@@ -78,28 +64,43 @@ export class ApiConsumerFactory<ValidMethods extends string> {
         method: ValidMethods,
         data?: ApiRequestConfig
     ) => {
-        console.log(this._endpoint, method, data);
+        console.log(this._baseEndpoint, method, data);
         if (this._validEndpoints && !this._validEndpoints.includes(method))
-            throw new ApiException(405, 'Method not implemented');
+            throw new ApiException(405, 'Method not allowed');
 
-        const endpoint = `${this._replaceParams(this._endpoint, data?.params)}${this._querySerializer(data?.queryParams)}`;
-        // const authHeaders = await getHeaders();
-        // console.log(endpoint, authHeaders);
+        const endpoint = this._replaceParams(this._baseEndpoint, data?.params);
+        const url = `/api/${endpoint}${this._querySerializer(data?.queryParams)}`;
+        
+        console.log('Consume - Final URL:', `${ApiConsumerFactory.baseURL}${url}`);
+        console.log('Consume - Method:', method);
+        console.log('Consume - Options:', JSON.stringify(data));
 
-        delete data?.params;
-        delete data?.queryParams;
         return tryAxios(this._axios, {
-            method: method,
-            url: endpoint,
-            headers: {
-                // ...authHeaders,
-                ...data?.headers,
-                'Content-Type': 'application/json'
-            },
             ...data,
-        }).then(res => {
-            return res;
+            method,
+            url
         });
+    }
+
+    private _replaceParams = (endpoint: string, params?: { [key: string]: any }) => {
+        console.log('ReplaceParams - Input endpoint:', endpoint);
+        console.log('ReplaceParams - Input params:', JSON.stringify(params));
+        
+        const regex = /{(\w+)}/g;
+        const match = endpoint.match(regex);
+        if (!match) return endpoint;
+
+        let toReplace = endpoint;
+        match.forEach((m) => {
+            const paramName = m.replace(/{|}/g, '');
+            const paramValue = params?.[paramName];
+            console.log(`ReplaceParams - Replacing ${paramName} with ${paramValue}`);
+            if (!paramValue) throw new ApiException(400, `Parameter ${paramName} is required`);
+            toReplace = toReplace.replace(m, paramValue);
+        });
+
+        console.log('ReplaceParams - Output endpoint:', toReplace);
+        return toReplace;
     }
 }
 

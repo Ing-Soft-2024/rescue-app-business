@@ -18,7 +18,7 @@ export default function ProductPage() {
     const { data, loading, error, reload } = useClientFetch({
         consumer: commerceDetailsConsumer,
         method: 'GET',
-        options: { params: { id: business?.id } }
+        options: { params: { id: 1 } }
     });
     const params = useLocalSearchParams();
 
@@ -28,7 +28,9 @@ export default function ProductPage() {
         }
     }, [params.refresh]))
 
-    console.log(data);
+    console.log("31,",data);
+    console.log("32,",business);
+    console.log("33,",error);
     if (error) return <Text>{error}</Text>;
     return (
         <>
