@@ -12,32 +12,31 @@ import { FlatList, RefreshControl, Text } from "react-native";
 
 export default function ProductPage() {
     const { signOut } = useSession();
-
     const { business } = useBusiness();
 
     const params = React.useMemo(() => ({
-        id: 1, // or whatever ID you're using
-        refresh: false // Add this property
-    }), []); // Empty dependency array if ID never changes
+        id: business?.id,
+        refresh: false
+    }), [business?.id]);
 
     const { data: commerceDetails, loading, error, reload } = useClientFetch({
         consumer: commerceDetailsConsumer,
         method: 'GET',
         options: {
-            params
+            params,
+            enabled: !!business?.id
         }
     });
 
     useFocusEffect(React.useCallback(() => {
-        if (params.refresh) {
+        if (params.refresh && business?.id) {
             reload();
         }
-    }, [params.refresh, reload]));
+    }, [params.refresh, reload, business?.id]));
 
-    console.log("31,",commerceDetails);
-    console.log("32,",business);
-    
+    if (!business?.id) return <Text>Loading business...</Text>;
     if (error) return <Text>{error}</Text>;
+    
     return (
         <>
             <FlatList
@@ -51,11 +50,6 @@ export default function ProductPage() {
             />
             <FloatingButton />
             <QRFloatingButton />
-
-            {/* <Button
-                title="Cerrar sesion"
-                onPress={signOut}
-            /> */}
         </>
     );
 }

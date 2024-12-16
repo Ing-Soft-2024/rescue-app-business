@@ -6,13 +6,15 @@ import { ApiConsumerFactory, ApiRequestConfig } from "../services/client/api.fac
 export const useClientFetch = ({ consumer, method, options }: {
     consumer: ApiConsumerFactory<any>,
     method: string,
-    options?: ApiRequestConfig
+    options?: ApiRequestConfig & { enabled?: boolean }
 }) => {
     const [data, setData] = React.useState<any>(null);
-    const [loading, setLoading] = React.useState(true);
+    const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState<string>();
 
     const fetchData = React.useCallback(async () => {
+        if (options?.enabled === false) return;
+        
         setLoading(true);
         try {
             const result = await consumer.consume(method, options);
@@ -30,13 +32,11 @@ export const useClientFetch = ({ consumer, method, options }: {
 
     useFocusEffect(
         React.useCallback(() => {
-            fetchData();
-        }, [fetchData])
+            if (options?.enabled !== false) {
+                fetchData();
+            }
+        }, [fetchData, options?.enabled])
     );
 
-    const reload = () => {
-        fetchData();
-    };
-
-    return { data, loading, error, reload };
+    return { data, loading, error, reload: fetchData };
 };
