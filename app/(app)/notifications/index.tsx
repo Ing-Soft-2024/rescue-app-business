@@ -8,10 +8,10 @@ export default function NotificationsScreen() {
 
     const handleNotificationPress = (notification: OrderNotification) => {
         markAsRead(notification.id);
-        router.push({
-            pathname: '/scan/scannedOrder',
-            params: { id: notification.id }
-        });
+        // router.push({
+        //     pathname: '/scan/scannedOrder',
+        //     params: { id: notification.id }
+        // });
     };
 
     return (
