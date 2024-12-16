@@ -4,11 +4,11 @@ import { ProductItem } from "@/src/components/product/product.item";
 import { useBusiness } from "@/src/context/business.context";
 import { useSession } from "@/src/context/session.context";
 import { useClientFetch } from "@/src/hooks/fetch.hook";
-import { commerceDetailsConsumer } from "@/src/services/client";
+import { commerceDetailsConsumer, productConsumer } from "@/src/services/client";
 import { ProductType } from "@/src/types/product.type";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import React from "react";
-import { FlatList, RefreshControl, Text } from "react-native";
+import { Button, FlatList, RefreshControl, Text } from "react-native";
 
 export default function ProductPage() {
     const { signOut } = useSession();
@@ -36,6 +36,19 @@ export default function ProductPage() {
 
     if (!business?.id) return <Text>Loading business...</Text>;
     if (error) return <Text>{error}</Text>;
+
+    async function tempAddProduct(): Promise<void> {
+        const response = await productConsumer.consume('POST', {
+            data: {
+                name: "Test",
+                description: "Test",
+                price: 100,
+                stock: 3,
+                businessId: business?.id
+            }
+        });
+    }
+
     
     return (
         <>
@@ -49,6 +62,8 @@ export default function ProductPage() {
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
             />
             <FloatingButton />
+            <Button title="Add Product" onPress={tempAddProduct} />
+
             <QRFloatingButton />
         </>
     );
