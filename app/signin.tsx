@@ -15,14 +15,8 @@ export default function AuthLayout() {
         });
     }
 
-    const navigateToIndex = ({
+    const navigateToIndex = () => {
         
-    }: {
-
-    }) => {
-        
-        hasBusiness();
-
         router.push('./(screens)/index.tsx');  // lleva al usuario a la pantalla de home (index)
     };
 
@@ -82,7 +76,7 @@ export default function AuthLayout() {
                     secureTextEntry={true}
                 />
 
-                <Pressable style={styles.button} onPress={() => { }}>
+                <Pressable style={styles.button} onPress={() => navigateToIndex()}>
                     <Text style={styles.buttonText}>Iniciar sesión</Text>
                 </Pressable>
                 <View>

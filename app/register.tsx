@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { TextInput, View, Text, StyleSheet, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
 import { registerConsumer } from '@/src/services/client';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function RegisterScreen() {
     const [firstName, setFirstName] = useState('');
@@ -37,7 +37,7 @@ export default function RegisterScreen() {
                 }
             });
             console.log('Registration successful:', response);
-            router.push('/login-screen'); // Redirect to login after successful registration
+            // router.push('/login-screen'); // Redirect to login after successful registration
         } catch (error) {
             console.error('Registration error:', error);
             // Handle registration error (show message to user)

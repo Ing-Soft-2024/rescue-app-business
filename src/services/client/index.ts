@@ -64,3 +64,8 @@ export const userBusinessConsumer = apiConsumerFactory({
     endpoint: 'user/business',
     validEndpoints: ['GET']
 });
+
+export const mercadoPagoAuthConsumer = apiConsumerFactory({
+    endpoint: 'auth/mercadopago',
+    validEndpoints: ['POST']
+});
