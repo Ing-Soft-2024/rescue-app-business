@@ -2,13 +2,14 @@ import { useSession } from '@/src/context/session.context';
 import { userBusinessConsumer } from '@/src/services/client';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, ActivityIndicator, Alert } from "react-native";
 
 export default function AuthLayout() {
     const { signInWith } = useSession();
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const hasBusiness = async (userId: number): Promise<Boolean> => {
         console.log(userId);
@@ -21,16 +22,27 @@ export default function AuthLayout() {
     }
 
     const signInWithCredentials = async () => {        
-        const session = await signInWith("Credentials", {
-            email: email,
-            password: password
-        }).catch((err) => console.error(err));
-        if(!session) return;
+        setIsLoading(true);
+        try {
+            const session = await signInWith("Credentials", {
+                email: email,
+                password: password
+            }).catch((err) => console.error('Login error:', err));
+            if(!session) return;
 
-        console.log(session);
-        const exists = await hasBusiness(session.user.id);
-        if(!exists) return router.push('/create_commerce');
-        //router.push('./(app)/');  // lleva al usuario a la pantalla de home (index)
+            console.log(session);
+            const exists = await hasBusiness(session.user.id);
+            if(!exists) return router.push('/create_commerce');
+            //router.push('./(app)/');  // lleva al usuario a la pantalla de home (index)
+        } catch (error) {
+            console.error('Login error:', error);
+            Alert.alert(
+                "Error",
+                "Credenciales inválidas. Por favor, intente nuevamente."
+            );
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const navigateToRegister = () => {
@@ -99,8 +111,19 @@ export default function AuthLayout() {
                             value={password}
                         />
 
-                        <Pressable style={styles.button} onPress={() => signInWithCredentials()}>
-                            <Text style={styles.buttonText}>Iniciar sesión</Text>
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.button,
+                                { opacity: pressed || isLoading ? 0.7 : 1 }
+                            ]}
+                            onPress={signInWithCredentials}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? (
+                                <ActivityIndicator color="white" />
+                            ) : (
+                                <Text style={styles.buttonText}>Iniciar Sesión</Text>
+                            )}
                         </Pressable>
                         <View>
                             <Text style={{

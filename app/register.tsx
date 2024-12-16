@@ -11,7 +11,9 @@ import {
     Text,
     TextInput,
     TouchableWithoutFeedback,
-    View
+    View,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 
 export default function RegisterScreen() {
@@ -23,6 +25,7 @@ export default function RegisterScreen() {
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
 
@@ -35,6 +38,7 @@ export default function RegisterScreen() {
     };
 
     const handleRegister = async () => {
+        setIsLoading(true);
         try {
             const response = await registerConsumer.consume('POST', {
                 data: {
@@ -47,9 +51,19 @@ export default function RegisterScreen() {
                     state
                 }
             });
-            router.push('/signin');
+            Alert.alert(
+                "Éxito",
+                "Registro completado exitosamente",
+                [{ text: "OK", onPress: () => router.push('/signin') }]
+            );
         } catch (error) {
             console.error('Registration error:', error);
+            Alert.alert(
+                "Error",
+                "No se pudo completar el registro. Por favor, intente nuevamente."
+            );
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -131,11 +145,19 @@ export default function RegisterScreen() {
                             returnKeyType="done"
                         />
 
-                        <Pressable 
-                            style={styles.registerButton} 
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.registerButton,
+                                { opacity: pressed || isLoading ? 0.7 : 1 }
+                            ]}
                             onPress={handleRegister}
+                            disabled={isLoading}
                         >
-                            <Text style={styles.registerButtonText}>Registrarse</Text>
+                            {isLoading ? (
+                                <ActivityIndicator color="white" />
+                            ) : (
+                                <Text style={styles.registerButtonText}>Registrarse</Text>
+                            )}
                         </Pressable>
 
                         <Pressable onPress={onPressBack}>

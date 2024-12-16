@@ -3,7 +3,7 @@ import { useSession } from '@/src/context/session.context';
 import { commerceConsumer } from '@/src/services/client';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, Alert, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, Alert, View, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 
 export default function RegisterScreen() {
@@ -23,6 +23,7 @@ export default function RegisterScreen() {
         city: false,
         state: false
     });
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
 
@@ -96,18 +97,19 @@ export default function RegisterScreen() {
             if (!validateInputs()) {
                 Alert.alert(
                     "Error de validación",
-                    "Por favor, complete todos los campos correctamente.",
-                    [{ text: "OK" }]
+                    "Por favor, complete todos los campos correctamente."
                 );
                 return;
             }
+
+            setIsLoading(true);
 
             if (!coordinates) {
                 await getCoordinatesFromAddress();
             }
 
             if (!coordinates) {
-                Alert.alert('Error', 'Could not determine location coordinates');
+                Alert.alert('Error', 'No se pudo determinar la ubicación');
                 return;
             }
 
@@ -123,14 +125,20 @@ export default function RegisterScreen() {
                     longitude: coordinates.longitude
                 }
             });
-            router.push('./(app)/');
+
+            Alert.alert(
+                "Éxito",
+                "Comercio creado exitosamente",
+                [{ text: "OK", onPress: () => router.push('./(app)/') }]
+            );
         } catch (error) {
             console.error('Error al crear comercio:', error);
             Alert.alert(
                 "Error",
-                "Hubo un error al crear el comercio. Por favor, intente nuevamente.",
-                [{ text: "OK" }]
+                "Hubo un error al crear el comercio. Por favor, intente nuevamente."
             );
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -208,10 +216,18 @@ export default function RegisterScreen() {
                 )}
 
                 <Pressable 
-                    style={styles.registerButton} 
+                    style={[
+                        styles.registerButton,
+                        { opacity: isLoading ? 0.7 : 1 }
+                    ]} 
                     onPress={handleRegister}
+                    disabled={isLoading}
                 >
-                    <Text style={styles.registerButtonText}>Registrar Comercio</Text>
+                    {isLoading ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <Text style={styles.registerButtonText}>Registrar Comercio</Text>
+                    )}
                 </Pressable>
 
                 <Pressable onPress={onPressBack}>

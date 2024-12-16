@@ -9,7 +9,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 
 
-import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, ActivityIndicator } from "react-native";
 
 import { useBusiness } from "@/src/context/business.context";
 import StorageController from "@/src/services/storage/controller/storage.controller";
@@ -55,7 +55,7 @@ export default function ProductPage() {
 
     const cancelProduct = () => router.back();
 
-    const [loading, setLoading] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const validateProduct = (): boolean => {
         // Check for empty fields
@@ -95,25 +95,15 @@ export default function ProductPage() {
                 return;
             }
 
-            console.log('Starting product creation with image:', image);
-
-            // Show loading state
-            setLoading(true);
-
+            setIsLoading(true);
             const uploadedImageUrl = await StorageController.upload(image, imageBase64)
                 .catch(error => {
                     console.error('Image upload error:', error);
-                    if (error.response) {
-                        console.error('Error response:', error.response.data);
-                    }
                     Alert.alert("Error", "Error al procesar la imagen");
                     return null;
                 });
 
-            console.log("Uploaded image URL:", uploadedImageUrl);
-
             if (!uploadedImageUrl) {
-                setLoading(false);
                 return;
             }
 
@@ -122,14 +112,16 @@ export default function ProductPage() {
                 image: uploadedImageUrl
             };
 
-            console.log('Sending product data:', updatedProduct);
-
             const response = await productConsumer.consume('POST', { 
                 data: updatedProduct 
             });
 
             if (response) {
-                router.dismissAll();
+                Alert.alert(
+                    "Éxito",
+                    "Producto creado exitosamente",
+                    [{ text: "OK", onPress: () => router.dismissAll() }]
+                );
             } else {
                 Alert.alert("Error", "Error al crear el producto");
             }
@@ -140,7 +132,7 @@ export default function ProductPage() {
                 "Hubo un error al crear el producto. Por favor, intente nuevamente."
             );
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
@@ -268,12 +260,17 @@ export default function ProductPage() {
                         backgroundColor: pressed ? "#333" : "#000",
                         padding: 14,
                         borderRadius: 5,
-                        alignItems: "center"
+                        alignItems: "center",
+                        opacity: isLoading ? 0.7 : 1
                     })}
-
                     onPress={saveProduct}
+                    disabled={isLoading}
                 >
-                    <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
+                    {isLoading ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <Text style={{ color: "white", fontSize: 16 }}>Guardar</Text>
+                    )}
                 </Pressable>
 
                 <Pressable
