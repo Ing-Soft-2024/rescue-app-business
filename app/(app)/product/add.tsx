@@ -57,8 +57,39 @@ export default function ProductPage() {
 
     const [loading, setLoading] = React.useState(false);
 
+    const validateProduct = (): boolean => {
+        // Check for empty fields
+        if (!product.name.trim()) {
+            Alert.alert("Error", "El nombre del producto es requerido");
+            return false;
+        }
+
+        if (!product.description.trim()) {
+            Alert.alert("Error", "La descripción del producto es requerida");
+            return false;
+        }
+
+        // Check if price is a valid number and greater than 0
+        if (isNaN(product.price) || product.price <= 0) {
+            Alert.alert("Error", "El precio debe ser un número mayor a 0");
+            return false;
+        }
+
+        // Check if stock is a valid number and not negative
+        if (isNaN(product.stock) || product.stock < 0) {
+            Alert.alert("Error", "El stock debe ser un número mayor o igual a 0");
+            return false;
+        }
+
+        return true;
+    };
+
     const saveProduct = async () => {
         try {
+            if (!validateProduct()) {
+                return;
+            }
+
             if (!image) {
                 Alert.alert("Error", "Por favor, seleccione una imagen");
                 return;
@@ -110,6 +141,25 @@ export default function ProductPage() {
             );
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Also add input validation on change:
+    const handlePriceChange = (text: string) => {
+        const number = parseFloat(text);
+        if (text === '' || isNaN(number)) {
+            setProduct(prev => ({ ...prev, price: 0 }));
+        } else {
+            setProduct(prev => ({ ...prev, price: number }));
+        }
+    };
+
+    const handleStockChange = (text: string) => {
+        const number = parseInt(text, 10);
+        if (text === '' || isNaN(number)) {
+            setProduct(prev => ({ ...prev, stock: 0 }));
+        } else {
+            setProduct(prev => ({ ...prev, stock: number }));
         }
     };
 
@@ -174,7 +224,8 @@ export default function ProductPage() {
                                     style={{ flex: 1 }}
                                     placeholder="Precio"
                                     keyboardType="numeric"
-                                    onChangeText={(text) => setProduct((product) => ({ ...product, price: Number(text) }))}
+                                    onChangeText={handlePriceChange}
+                                    value={product.price > 0 ? product.price.toString() : ''}
                                 />
                             </View>
                         </LabeledInput>
@@ -185,7 +236,8 @@ export default function ProductPage() {
                                     style={{ flex: 1 }}
                                     placeholder="Stock"
                                     keyboardType="numeric"
-                                    onChangeText={(text) => setProduct((product) => ({ ...product, stock: Number(text) }))}
+                                    onChangeText={handleStockChange}
+                                    value={product.stock > 0 ? product.stock.toString() : ''}
                                 />
                             </View>
                         </LabeledInput>

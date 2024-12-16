@@ -4,7 +4,7 @@ import { ProductType } from "@/src/types/product.type";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 const LabeledInput = ({ label, children }: {
     label: string;
@@ -39,8 +39,57 @@ export default function EditProductPage() {
 
     const cancelProduct = () => router.back();
 
+    const validateProduct = (): boolean => {
+        // Check for empty fields
+        if (!product.name.trim()) {
+            Alert.alert("Error", "El nombre del producto es requerido");
+            return false;
+        }
+
+        if (!product.description.trim()) {
+            Alert.alert("Error", "La descripción del producto es requerida");
+            return false;
+        }
+
+        // Check if price is a valid number and greater than 0
+        if (isNaN(product.price) || product.price <= 0) {
+            Alert.alert("Error", "El precio debe ser un número mayor a 0");
+            return false;
+        }
+
+        // Check if stock is a valid number and not negative
+        if (isNaN(product.stock) || product.stock < 0) {
+            Alert.alert("Error", "El stock debe ser un número mayor o igual a 0");
+            return false;
+        }
+
+        return true;
+    };
+
+    const handlePriceChange = (text: string) => {
+        const number = parseFloat(text);
+        if (text === '' || isNaN(number)) {
+            setProduct(prev => ({ ...prev, price: 0 }));
+        } else {
+            setProduct(prev => ({ ...prev, price: number }));
+        }
+    };
+
+    const handleStockChange = (text: string) => {
+        const number = parseInt(text, 10);
+        if (text === '' || isNaN(number)) {
+            setProduct(prev => ({ ...prev, stock: 0 }));
+        } else {
+            setProduct(prev => ({ ...prev, stock: number }));
+        }
+    };
+
     const saveProduct = async () => {
         try {
+            if (!validateProduct()) {
+                return;
+            }
+
             await productDetailsConsumer.consume('POST', {
                 params: { id: product.id },
                 data: product
@@ -52,6 +101,10 @@ export default function EditProductPage() {
             }, 100);
         } catch (error) {
             console.error('Error saving product:', error);
+            Alert.alert(
+                "Error",
+                "Hubo un error al guardar el producto. Por favor, intente nuevamente."
+            );
         }
     };
 
@@ -112,7 +165,7 @@ export default function EditProductPage() {
                                 placeholder="Precio"
                                 value={String(product.price)}
                                 keyboardType="numeric"
-                                onChangeText={(text) => setProduct(prev => ({ ...prev, price: Number(text) }))}
+                                onChangeText={handlePriceChange}
                             />
                         </View>
                     </LabeledInput>
@@ -124,7 +177,7 @@ export default function EditProductPage() {
                                 placeholder="Stock"
                                 value={String(product.stock)}
                                 keyboardType="numeric"
-                                onChangeText={(text) => setProduct(prev => ({ ...prev, stock: Number(text) }))}
+                                onChangeText={handleStockChange}
                             />
                         </View>
                     </LabeledInput>
