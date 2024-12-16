@@ -3,7 +3,8 @@ import { useSession } from '@/src/context/session.context';
 import { commerceConsumer } from '@/src/services/client';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, Alert } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, Alert, View } from 'react-native';
+import * as Location from 'expo-location';
 
 export default function RegisterScreen() {
     const { session } = useSession();
@@ -12,6 +13,10 @@ export default function RegisterScreen() {
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
     const [state, setState] = useState('');
+    const [coordinates, setCoordinates] = useState<{
+        latitude: number;
+        longitude: number;
+    } | null>(null);
     const [errors, setErrors] = useState({
         name: false,
         address: false,
@@ -38,6 +43,54 @@ export default function RegisterScreen() {
         return !Object.values(newErrors).some(error => error);
     };
 
+    const getCurrentLocation = async () => {
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permission denied', 'Allow location access to continue');
+                return;
+            }
+
+            const location = await Location.getCurrentPositionAsync({});
+            setCoordinates({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
+            });
+
+            // Get address from coordinates (reverse geocoding)
+            const [addressInfo] = await Location.reverseGeocodeAsync({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
+            });
+
+            if (addressInfo) {
+                setAddress(addressInfo.street || '');
+                setCity(addressInfo.city || '');
+                setState(addressInfo.region || '');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Could not get current location');
+        }
+    };
+
+    const getCoordinatesFromAddress = async () => {
+        try {
+            const fullAddress = `${address},${state}, Argentina`;
+            const results = await Location.geocodeAsync(fullAddress);
+
+            if (results.length > 0) {
+                setCoordinates({
+                    latitude: results[0].latitude,
+                    longitude: results[0].longitude
+                });
+            } else {
+                Alert.alert('Error', 'Could not find coordinates for this address');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Could not get coordinates from address');
+        }
+    };
+
     const handleRegister = async () => {
         try {
             if (!validateInputs()) {
@@ -49,6 +102,15 @@ export default function RegisterScreen() {
                 return;
             }
 
+            if (!coordinates) {
+                await getCoordinatesFromAddress();
+            }
+
+            if (!coordinates) {
+                Alert.alert('Error', 'Could not determine location coordinates');
+                return;
+            }
+
             await commerceConsumer.consume('POST', {
                 data: {
                     userId: session?.user.id,
@@ -56,7 +118,9 @@ export default function RegisterScreen() {
                     country: "Argentina",
                     address: address.trim(),
                     city: city.trim(),
-                    state: state.trim()
+                    state: state.trim(),
+                    latitude: coordinates.latitude,
+                    longitude: coordinates.longitude
                 }
             });
             router.push('./(app)/');
@@ -128,6 +192,19 @@ export default function RegisterScreen() {
                 />
                 {errors.state && (
                     <Text style={styles.errorText}>La provincia es requerida</Text>
+                )}
+
+                <Pressable 
+                    style={styles.locationButton} 
+                    onPress={getCurrentLocation}
+                >
+                    <Text style={styles.locationButtonText}>Usar ubicación actual</Text>
+                </Pressable>
+
+                {coordinates && (
+                    <Text style={styles.coordinatesText}>
+                        Ubicación: {coordinates.latitude.toFixed(6)}, {coordinates.longitude.toFixed(6)}
+                    </Text>
                 )}
 
                 <Pressable 
@@ -203,4 +280,20 @@ const styles = StyleSheet.create({
         color: '#8D6E63',
         fontSize: 16,
     },
+    locationButton: {
+        backgroundColor: '#4CAF50',
+        padding: 15,
+        borderRadius: 5,
+        marginVertical: 10,
+    },
+    locationButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    coordinatesText: {
+        textAlign: 'center',
+        color: '#666',
+        marginVertical: 10,
+    }
 });
