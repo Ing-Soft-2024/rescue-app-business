@@ -218,7 +218,7 @@ export default function RegisterScreen() {
                     <Text style={styles.loginLink}>Volver</Text>
                 </Pressable>
 
-                <ConnectCommerce redirect_uri='com.tjuhasz.rescueappbussiness://mercadopago-auth' />
+                <ConnectCommerce redirect_uri='https://kepleris.com/mercadopago-auth' />
             </KeyboardAvoidingView>
         </ScrollView>
     );

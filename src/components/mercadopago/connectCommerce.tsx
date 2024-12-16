@@ -2,6 +2,9 @@ import { mercadoPagoAuthConsumer } from "@/src/services/client";
 import SecureStore from 'expo-secure-store';
 import { openAuthSessionAsync } from "expo-web-browser";
 import { Button } from "react-native";
+import * as Crypto from 'expo-crypto';
+import { Buffer } from 'buffer';
+
 
 const verifyAuthMercadoPago = async ({
   client_id,
@@ -46,32 +49,57 @@ async function generateCodeVerifier(): Promise<string> {
 }
 
 async function generateCodeChallenge(verifier: string): Promise<string> {
-  // En este caso usamos el método "plain" que es más simple
-  // y está soportado por Mercado Pago
-  return verifier;
+    const digest = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        verifier
+    );
+    
+    return btoa(String.fromCharCode(...new Uint8Array(Buffer.from(digest, 'hex'))))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
 }
 
 async function openAuthSession({ appId, redirectUri }: AuthParams) {
   try {
     const codeVerifier = await generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
+    const state = generateRandomString(16);
     
     const authUrl = `https://auth.mercadopago.com/authorization?` + 
       `response_type=code` +
       `&client_id=${appId}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&code_challenge=${codeChallenge}` +
-      `&code_challenge_method=plain`;
+      `&code_challenge_method=S256` +
+      `&platform_id=mp` +
+      `&state=${state}`;
 
-    const result = await openAuthSessionAsync(authUrl, redirectUri);
-    const responseUrl = result.type === 'success' ? result.url : null;
-    if (!responseUrl) {
-      throw new Error('No se pudo abrir la sesión de autenticación.');
+    const result = await openAuthSessionAsync(
+      authUrl,
+      redirectUri,
+      {
+        showInRecents: true,
+        
+      }
+    );
+
+    if (result.type !== 'success') {
+      throw new Error('Authentication was cancelled');
     }
 
-    const urlParams = new URLSearchParams(responseUrl);
-    const code = urlParams.get('code');
-    if (!code) throw new Error('No se encontró el código de autorización.');
+    const url = new URL(result.url);
+    const code = url.searchParams.get('code');
+    const returnedState = url.searchParams.get('state');
+
+    // Verify state matches to prevent CSRF attacks
+    if (!code || !returnedState) {
+      throw new Error('Missing authorization code or state');
+    }
+
+    if (state !== returnedState) {
+      throw new Error('Invalid state parameter');
+    }
 
     const verifyResponse = await verifyAuthMercadoPago({
       client_id: appId,
@@ -97,7 +125,7 @@ export const ConnectCommerce = ({
   const handleAuth = async () => {
     try {
       const response = await openAuthSession({
-        appId: '4993987139809199',
+        appId: '2381168209109958',
         redirectUri: redirect_uri
       });
       

@@ -20,16 +20,15 @@ export const BusinessProvider = ({ children }: { children: React.ReactNode }) =>
     const [business, setBusiness] = React.useState<Business>();
     const { session } = useSession();
     
-    useFocusEffect(React.useCallback(() => {
-        if (!session?.user.id) return;
-        getMyBusiness(session?.user.id).then(setBusiness).catch(console.error);
-        return () => {
-            setBusiness(undefined);
-        }
-    }, [session]));
-    // React.useEffect(() => {
-    //     getMyBusiness(1).then(setBusiness);
-    // }, []);
+    React.useEffect(() => {
+        if (!session?.user?.id) return;
+        
+        getMyBusiness(session.user.id)
+            .then(setBusiness)
+            .catch(error => {
+                console.error('Error fetching business:', error);
+            });
+    }, [session?.user?.id]);
 
     return (
         <BusinessContext.Provider value={{
