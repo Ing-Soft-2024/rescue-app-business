@@ -1,5 +1,3 @@
-import { AppleIDButton } from '@/src/components/auth/appleid.button';
-import { GoogleComponent } from '@/src/components/auth/google.button';
 import { useSession } from '@/src/context/session.context';
 import { useRouter } from 'expo-router';
 import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -87,7 +85,18 @@ export default function AuthLayout() {
                 </View>
             </View>
 
-            <View style={{
+
+            <Pressable style={{
+                ...styles.button,
+                backgroundColor: '#70D294',
+                borderColor: '#70D294',
+            }} onPress={() => { }}>
+                    <Text style={{
+                        ...styles.buttonText,
+                        color: '#472E2E',
+                    }}>Registrarse</Text>
+            </Pressable>
+            {/* <View style={{
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
@@ -96,7 +105,7 @@ export default function AuthLayout() {
             }}>
                 <GoogleComponent />
                 <AppleIDButton />
-            </View>
+            </View> */}
         </KeyboardAvoidingView>
     )
 }
