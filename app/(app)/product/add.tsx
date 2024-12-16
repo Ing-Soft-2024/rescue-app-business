@@ -35,7 +35,6 @@ const LabeledInput = ({ label, children, ...props }: {
 
 
 export default function ProductPage() {
-
     const params = useLocalSearchParams();
     const image = React.useMemo<string>(() => params.imageUri as string, []);
 
@@ -56,8 +55,6 @@ export default function ProductPage() {
     const cancelProduct = () => router.back();
 
     const saveProduct = () => {
-        console.log(product);
-
         if (!image) return;
         StorageController.upload(image!)
             .then((image) => {
