@@ -27,6 +27,8 @@ export class CredentialsAuth {
             }
         });
 
+        if(!response) throw Error("Invalid credentials");
+
         return {
             user: response.user,
             token: response.token,
