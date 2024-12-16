@@ -1,3 +1,4 @@
+import { ConnectCommerce } from '@/src/components/mercadopago/connectCommerce';
 import { useSession } from '@/src/context/session.context';
 import { commerceConsumer } from '@/src/services/client';
 import { useRouter } from 'expo-router';
@@ -83,6 +84,8 @@ export default function RegisterScreen() {
                 <Pressable onPress={onPressBack}>
                     <Text style={styles.loginLink}>Volver</Text>
                 </Pressable>
+
+                <ConnectCommerce redirect_uri='http://localhost:3000' />
             </KeyboardAvoidingView>
         </ScrollView>
     );
