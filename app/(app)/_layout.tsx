@@ -1,12 +1,11 @@
 import { useSession } from "@/context/session.context";
 import { DrawerContent } from "@/src/components/base/drawer.button";
-import { BusinessProvider } from "@/src/context/business.context";
+import { NotificationsBell } from "@/src/components/base/notifications.bell";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Redirect, useRouter } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import { Pressable } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { NotificationsBell } from "@/src/components/base/notifications.bell";
 
 
 
@@ -18,8 +17,7 @@ export default function AppLayout() {
 
         
     return (
-        <BusinessProvider>
-            <GestureHandlerRootView style={{
+        <GestureHandlerRootView style={{
             flex: 1,
             backgroundColor: '#121212',
         }}>
@@ -85,6 +83,5 @@ export default function AppLayout() {
                 />
             </Drawer>
         </GestureHandlerRootView>
-        </BusinessProvider>
     );
 }

@@ -1,12 +1,11 @@
-import { useFocusEffect } from "expo-router";
 import React from "react";
-import { getMyBusiness } from "../services/commerce/commerce";
+import { useClientFetch } from "../hooks/fetch.hook";
+import { userBusinessConsumer } from "../services/client";
 import { Business } from "../types/business.type";
 import { useSession } from "./session.context";
 
 type BusinessContextType = {
     business: Business | undefined,
-    setBusiness: (business: Business) => void
 }
 
 export const BusinessContext = React.createContext<BusinessContextType | undefined>(undefined);
@@ -17,23 +16,21 @@ export const useBusiness = () => {
 }
 
 export const BusinessProvider = ({ children }: { children: React.ReactNode }) => {
-    const [business, setBusiness] = React.useState<Business>();
     const { session } = useSession();
     
-    React.useEffect(() => {
-        if (!session?.user?.id) return;
-        
-        getMyBusiness(session.user.id)
-            .then(setBusiness)
-            .catch(error => {
-                console.error('Error fetching business:', error);
-            });
-    }, [session?.user?.id]);
+    const { data: business } = useClientFetch({
+        consumer: userBusinessConsumer,
+        method: 'GET',
+        options: {
+            queryParams: {
+                userId: session?.user.id
+            }
+        }
+    })
 
     return (
         <BusinessContext.Provider value={{
-            business,
-            setBusiness
+            business
         }} >
             {children}
         </BusinessContext.Provider>
