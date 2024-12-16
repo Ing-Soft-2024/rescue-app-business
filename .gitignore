@@ -26,8 +26,9 @@ web-build/
 expo-env.d.ts
 # @end expo-cli
 
-/android
-/ios
+# Native build folders
+/android/
+/ios/
 
 # iOS - Google Services
 GoogleService-Info.plist*
