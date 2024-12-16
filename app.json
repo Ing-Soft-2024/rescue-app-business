@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/reskue-logo.png",
     "scheme": "rescueapp-bussiness",
+    "owner": "rescue",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",

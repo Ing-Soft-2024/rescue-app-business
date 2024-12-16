@@ -1,19 +1,26 @@
 {
   "cli": {
-    "version": ">= 12.5.1",
-    "appVersionSource": "remote"
+    "version": ">= 11.0.2"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_MERCADOPAGO_PUBLIC_KEY": "APP_USR-11682002-bcad-4264-8163-5bb45c0568fc",
+        "EXPO_PUBLIC_REACT_PUBLIC_API_URL": "https://varied-laurella-rescue-bafbd5dd.koyeb.app"
+      }
     },
-    "production": {
-      "autoIncrement": true
-    }
+    "production": {}
   },
   "submit": {
     "production": {}
