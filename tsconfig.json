@@ -18,7 +18,8 @@
       "@/auth/*": [
         "./src/services/auth/*"
       ],
-    }
+    },
+    "jsx": "react-native"
   },
   "include": [
     "**/*.ts",
