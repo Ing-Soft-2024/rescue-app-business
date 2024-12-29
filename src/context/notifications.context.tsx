@@ -28,6 +28,10 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     const [notifications, setNotifications] = React.useState<OrderNotification[]>([]);
     const { business } = useBusiness();
 
+    React.useEffect(() => {
+        setNotifications([]);
+    }, [business?.id]);
+
     const checkForNewOrders = React.useCallback(async () => {
         if (!business?.id) return;
 
