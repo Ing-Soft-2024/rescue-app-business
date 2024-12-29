@@ -44,7 +44,8 @@ export default function ProductPage() {
                 description: "Test",
                 price: 100,
                 stock: 3,
-                businessId: business?.id
+                businessId: business?.id,
+                categories: [1]
             }
         });
     }

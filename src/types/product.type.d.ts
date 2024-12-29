@@ -7,4 +7,5 @@ export type ProductType = {
     stock: number;
     businessId?: number;
     createdAt: Date;
+    categories: number[];
 }

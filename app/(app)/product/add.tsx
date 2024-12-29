@@ -10,15 +10,27 @@ import {
     Alert,
     ActivityIndicator,
     StyleSheet,
+    ScrollView,
 } from "react-native";
 import { useBusiness } from "@/src/context/business.context";
 import StorageController from "@/src/services/storage/controller/storage.controller";
+
+const CATEGORIES = [
+    { id: 1, name: 'Comida' },
+    { id: 2, name: 'Ropa' },
+    { id: 3, name: 'Hogar' },
+    { id: 4, name: 'Juguetes' },
+    { id: 5, name: 'Deportes' },
+    { id: 6, name: 'Libros' },
+    { id: 7, name: 'Herramientas' },
+];
 
 export default function ProductPage() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { business } = useBusiness();
     const [isLoading, setIsLoading] = React.useState(false);
+    const [selectedCategory, setSelectedCategory] = React.useState<number | null>(null);
 
     // Get image from params
     const image = params.imageUri as string;
@@ -32,7 +44,8 @@ export default function ProductPage() {
         image: '',
         businessId: business?.id,
         stock: 0,
-        createdAt: new Date()
+        createdAt: new Date(),
+        categories: []
     });
 
     // Basic validation
@@ -57,6 +70,10 @@ export default function ProductPage() {
             Alert.alert("Error", "La imagen es requerida");
             return false;
         }
+        if (selectedCategory === null) {
+            Alert.alert("Error", "Debe seleccionar una categoría");
+            return false;
+        }
         return true;
     };
 
@@ -73,9 +90,13 @@ export default function ProductPage() {
                 return;
             }
 
-            // Save product
+            // Save product with category
             const response = await productConsumer.consume('POST', {
-                data: { ...product, image: uploadedImageUrl }
+                data: { 
+                    ...product, 
+                    image: uploadedImageUrl,
+                    categories: selectedCategory ? [selectedCategory] : []
+                }
             });
 
             if (response) {
@@ -92,7 +113,7 @@ export default function ProductPage() {
     };
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <TextInput
                 style={styles.input}
                 placeholder="Nombre"
@@ -130,6 +151,27 @@ export default function ProductPage() {
                 keyboardType="numeric"
             />
 
+            <Text style={styles.categoryLabel}>Categoría:</Text>
+            <View style={styles.categoryContainer}>
+                {CATEGORIES.map((category) => (
+                    <Pressable
+                        key={category.id}
+                        style={[
+                            styles.categoryButton,
+                            selectedCategory === category.id && styles.categoryButtonSelected
+                        ]}
+                        onPress={() => setSelectedCategory(category.id)}
+                    >
+                        <Text style={[
+                            styles.categoryButtonText,
+                            selectedCategory === category.id && styles.categoryButtonTextSelected
+                        ]}>
+                            {category.name}
+                        </Text>
+                    </Pressable>
+                ))}
+            </View>
+
             <Pressable
                 style={styles.button}
                 onPress={handleSave}
@@ -148,7 +190,7 @@ export default function ProductPage() {
             >
                 <Text style={styles.buttonText}>Cancelar</Text>
             </Pressable>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -164,6 +206,36 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 10,
         borderRadius: 5,
+    },
+    categoryLabel: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginBottom: 8,
+    },
+    categoryContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+        marginBottom: 20,
+    },
+    categoryButton: {
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        backgroundColor: 'white',
+    },
+    categoryButtonSelected: {
+        backgroundColor: '#D4685E',
+        borderColor: '#D4685E',
+    },
+    categoryButtonText: {
+        color: '#666',
+    },
+    categoryButtonTextSelected: {
+        color: 'white',
     },
     button: {
         backgroundColor: 'black',
