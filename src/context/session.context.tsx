@@ -1,8 +1,9 @@
 import { authMethods, isValidAuthMethod } from "@/auth/index";
 import { Session, SessionContextType } from "@/src/types/session.type";
 import { useRouter } from "expo-router";
-import * as SecureStoreOptions from "expo-secure-store";
+import * as SecureStore from "expo-secure-store";
 import React from "react";
+import { userBusinessConsumer } from "../services/client";
 
 const SessionContext = React.createContext<SessionContextType | undefined>(undefined);
 export const useSession = () => {
@@ -15,37 +16,54 @@ export const useSession = () => {
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
-
     const [session, setSession] = React.useState<Session>();
+    const [hasCheckedBusiness, setHasCheckedBusiness] = React.useState(false);
 
-    // Load session from secure store
-    const getSessionFromSecureStore = async () => {
-        const session = await SecureStoreOptions.getItemAsync("session");
-        if (!session) return undefined;
-        return JSON.parse(session);
-    }
-
-    const refreshSession = (session?: Session) => {
-        if (!session || session.expiresAt > Date.now()) return;
-
-        authMethods[session.method].refreshSession(session)
-            .then(setSession)
-            .catch(console.error);
-    }
-
-    React.useEffect(() => {
-        getSessionFromSecureStore().then(setSession);
-
-        const interval = setInterval(() => refreshSession(session), 1000 * 60);
-        return () => {
-            clearInterval(interval);
+    // Check if user has a business
+    const checkBusiness = async (userId: number) => {
+        try {
+            const business = await userBusinessConsumer.consume('GET', {
+                queryParams: { userId }
+            });
+            setHasCheckedBusiness(true);
+            return !!business;
+        } catch (error) {
+            //console.error('Error checking business:', error);
+            return false;
         }
+    };
+
+    // Load session and check business status
+    React.useEffect(() => {
+        const loadSession = async () => {
+            const savedSession = await SecureStore.getItemAsync("session");
+            if (savedSession) {
+                const parsedSession = JSON.parse(savedSession);
+                setSession(parsedSession);
+                await checkBusiness(parsedSession.user.id);
+            } else {
+                setHasCheckedBusiness(true);
+            }
+        };
+        loadSession();
     }, []);
 
+    // Handle navigation based on session and business status
     React.useEffect(() => {
-        if (!session) return router.replace("/signin");
-        router.replace("/(app)");
-    }, [session])
+        if (!hasCheckedBusiness) return;
+
+        if (!session) {
+            router.replace("/signin");
+        } else {
+            checkBusiness(session.user.id).then(hasBusiness => {
+                if (!hasBusiness) {
+                    router.replace("/create_commerce");
+                } else {
+                    router.replace("/(app)");
+                }
+            });
+        }
+    }, [session, hasCheckedBusiness]);
 
     return (
         <SessionContext.Provider value={{
@@ -57,29 +75,22 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
                         .then((session) => {
                             if (!session) return;
                             setSession(session);
-    
-                            // Save session to secure store, persisting the session
-                            SecureStoreOptions
-                                .setItem("session", JSON.stringify(session));
-
+                            SecureStore.setItemAsync("session", JSON.stringify(session));
                             resolve(session);
                         })
                         .catch((error) => {
                             console.error(error);
                             reject(error);
                         });
-                })
+                });
             },
             signOut: () => {
                 if (!session) return;
-                // if (!isValidAuthMethod(session.method)) throw Error("Invalid sign out method");
                 authMethods["Credentials"].signOut()
                     .then(() => {
                         setSession(undefined);
-
-                        // Remove session from secure store
-                        SecureStoreOptions
-                            .deleteItemAsync("session");
+                        SecureStore.deleteItemAsync("session");
+                        router.replace("/signin");
                     })
                     .catch((error) => {
                         console.error(error);
