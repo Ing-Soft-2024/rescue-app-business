@@ -14,6 +14,39 @@ export default function NotificationsScreen() {
         // });
     };
 
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('es-AR', {
+            style: 'currency',
+            currency: 'ARS'
+        }).format(amount);
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'pending':
+                return '#FFA500'; // Orange
+            case 'completed':
+                return '#4CAF50'; // Green
+            case 'cancelled':
+                return '#FF0000'; // Red
+            default:
+                return '#666666'; // Gray
+        }
+    };
+
+    const getStatusText = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'pending':
+                return 'Pendiente';
+            case 'completed':
+                return 'Completado';
+            case 'cancelled':
+                return 'Cancelado';
+            default:
+                return status;
+        }
+    };
+
     return (
         <View style={styles.container}>
             <FlatList
@@ -27,10 +60,36 @@ export default function NotificationsScreen() {
                         ]}
                         onPress={() => handleNotificationPress(item)}
                     >
-                        <Text style={styles.title}>Nuevo pedido pendiente</Text>
-                        <Text style={styles.details}>
-                            Total: ${item.total}
-                        </Text>
+                        <View style={styles.headerContainer}>
+                            <Text style={styles.title}>Pedido #{item.id}</Text>
+                            <View style={[
+                                styles.statusBadge, 
+                                { backgroundColor: getStatusColor(item.status) }
+                            ]}>
+                                <Text style={styles.statusText}>
+                                    {getStatusText(item.status)}
+                                </Text>
+                            </View>
+                        </View>
+
+                        {item.order_items && item.order_items.map((product, index) => (
+                            <View key={index} style={styles.productItem}>
+                                <Text style={styles.productName}>
+                                    {product.quantity}x {product.name}
+                                </Text>
+                                <Text style={styles.productPrice}>
+                                    {formatCurrency(product.price * product.quantity)}
+                                </Text>
+                            </View>
+                        ))}
+                        
+                        <View style={styles.totalContainer}>
+                            <Text style={styles.totalLabel}>Total:</Text>
+                            <Text style={styles.totalAmount}>
+                                {formatCurrency(item.totalPrice)}
+                            </Text>
+                        </View>
+
                         <Text style={styles.time}>
                             {new Date(item.createdAt).toLocaleString()}
                         </Text>
@@ -50,6 +109,7 @@ const styles = StyleSheet.create({
         padding: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
+        backgroundColor: 'white',
     },
     unread: {
         backgroundColor: '#f7f7f7',
@@ -58,13 +118,57 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    details: {
-        marginTop: 4,
+    productItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 4,
+    },
+    productName: {
+        fontSize: 14,
+        color: '#444',
+    },
+    productPrice: {
+        fontSize: 14,
         color: '#666',
     },
+    totalContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 8,
+        paddingTop: 8,
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
+    },
+    totalLabel: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    totalAmount: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#D4685E',
+    },
     time: {
-        marginTop: 4,
+        marginTop: 8,
         fontSize: 12,
         color: '#999',
     },
-}); 
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    statusBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    statusText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+});
