@@ -134,7 +134,7 @@ export default function RegisterScreen() {
                 "Éxito",
                 "Comercio creado exitosamente",
                 [{ text: "OK", onPress: () => {
-                    router.push('./(app)/');
+                    router.replace('/(app)/');
                 } }]
             );
         } catch (error) {

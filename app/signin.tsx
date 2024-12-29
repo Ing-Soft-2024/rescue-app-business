@@ -30,10 +30,12 @@ export default function AuthLayout() {
             }).catch((err) => console.error('Login error:', err));
             if(!session) return;
 
-            console.log(session);
             const exists = await hasBusiness(session.user.id);
-            if(!exists) return router.push('/create_commerce');
-            //router.push('./(app)/');  // lleva al usuario a la pantalla de home (index)
+            if(!exists) {
+                router.replace('/create_commerce');  // Replace instead of push
+            } else {
+                router.replace('/(app)/');  // Replace instead of push
+            }
         } catch (error) {
             console.error('Login error:', error);
             Alert.alert(
