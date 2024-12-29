@@ -21,11 +21,21 @@ export default function RegisterScreen() {
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [address, setAddress] = useState('');
-    const [city, setCity] = useState('');
-    const [state, setState] = useState('');
+    
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    const [errors, setErrors] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+    });
+
+    const isValidEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
 
     const router = useRouter();
 
@@ -38,6 +48,53 @@ export default function RegisterScreen() {
     };
 
     const handleRegister = async () => {
+        setErrors({
+            firstName: '',
+            lastName: '',
+            email: '',
+            password: '',
+        });
+
+        let hasErrors = false;
+        const newErrors = {
+            firstName: '',
+            lastName: '',
+            email: '',
+            password: '',
+        };
+
+        if (!firstName.trim()) {
+            newErrors.firstName = 'El nombre es requerido';
+            hasErrors = true;
+        }
+
+        if (!lastName.trim()) {
+            newErrors.lastName = 'El apellido es requerido';
+            hasErrors = true;
+        }
+
+        if (!email.trim()) {
+            newErrors.email = 'El correo electrónico es requerido';
+            hasErrors = true;
+        } else if (!isValidEmail(email)) {
+            newErrors.email = 'Formato de correo electrónico inválido';
+            hasErrors = true;
+        }
+
+        if (!password.trim()) {
+            newErrors.password = 'La contraseña es requerida';
+            hasErrors = true;
+        } else if (password.length < 3) {
+            newErrors.password = 'La contraseña debe tener al menos 3 caracteres';
+            hasErrors = true;
+        }
+
+        setErrors(newErrors);
+
+        if (hasErrors) {
+            return;
+        }
+
         setIsLoading(true);
         try {
             const response = await registerConsumer.consume('POST', {
@@ -46,9 +103,7 @@ export default function RegisterScreen() {
                     lastName,
                     email,
                     password,
-                    address,
-                    city,
-                    state
+                
                 }
             });
             Alert.alert(
@@ -85,27 +140,30 @@ export default function RegisterScreen() {
                             placeholder="Nombre"
                             value={firstName}
                             onChangeText={setFirstName}
-                            style={styles.input}
+                            style={[styles.input, errors.firstName ? styles.inputError : null]}
                             returnKeyType="next"
                         />
+                        {errors.firstName ? <Text style={styles.errorText}>{errors.firstName}</Text> : null}
 
                         <TextInput
                             placeholder="Apellido"
                             value={lastName}
                             onChangeText={setLastName}
-                            style={styles.input}
+                            style={[styles.input, errors.lastName ? styles.inputError : null]}
                             returnKeyType="next"
                         />
+                        {errors.lastName ? <Text style={styles.errorText}>{errors.lastName}</Text> : null}
 
                         <TextInput
                             placeholder="Correo electrónico"
                             value={email}
                             onChangeText={setEmail}
-                            style={styles.input}
+                            style={[styles.input, errors.email ? styles.inputError : null]}
                             keyboardType="email-address"
                             autoCapitalize="none"
                             returnKeyType="next"
                         />
+                        {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
                         <View style={styles.passwordContainer}>
                             <TextInput
@@ -113,37 +171,14 @@ export default function RegisterScreen() {
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!showPassword}
-                                style={styles.passwordInput}
+                                style={[styles.passwordInput, errors.password ? styles.inputError : null]}
                                 returnKeyType="next"
                             />
                             <Pressable onPress={togglePasswordVisibility} style={styles.toggleButton}>
                                 <Text>{showPassword ? 'Ocultar' : 'Mostrar'}</Text>
                             </Pressable>
                         </View>
-
-                        <TextInput
-                            placeholder="Dirección"
-                            value={address}
-                            onChangeText={setAddress}
-                            style={styles.input}
-                            returnKeyType="next"
-                        />
-
-                        <TextInput
-                            placeholder="Ciudad"
-                            value={city}
-                            onChangeText={setCity}
-                            style={styles.input}
-                            returnKeyType="next"
-                        />
-
-                        <TextInput
-                            placeholder="Estado/Provincia"
-                            value={state}
-                            onChangeText={setState}
-                            style={styles.input}
-                            returnKeyType="done"
-                        />
+                        {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
                         <Pressable
                             style={({ pressed }) => [
@@ -235,5 +270,15 @@ const styles = StyleSheet.create({
         marginTop: 20,
         color: '#8D6E63',
         fontSize: 16,
+    },
+    inputError: {
+        borderColor: '#FF0000',
+        borderWidth: 1,
+    },
+    errorText: {
+        color: '#FF0000',
+        fontSize: 12,
+        marginBottom: 10,
+        marginTop: -10,
     },
 });
