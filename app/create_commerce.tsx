@@ -5,9 +5,11 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, Alert, View, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
+import { useBusiness } from '@/src/context/business.context';
 
 export default function RegisterScreen() {
     const { session } = useSession();
+    const { setBusiness } = useBusiness();
 
     const [name, setName] = useState('');
     const [address, setAddress] = useState('');
@@ -113,7 +115,7 @@ export default function RegisterScreen() {
                 return;
             }
 
-            await commerceConsumer.consume('POST', {
+            const commerce = await commerceConsumer.consume('POST', {
                 data: {
                     userId: session?.user.id,
                     name: name.trim(),
@@ -126,10 +128,14 @@ export default function RegisterScreen() {
                 }
             });
 
+            setBusiness(commerce);
+
             Alert.alert(
                 "Éxito",
                 "Comercio creado exitosamente",
-                [{ text: "OK", onPress: () => router.push('./(app)/') }]
+                [{ text: "OK", onPress: () => {
+                    router.push('./(app)/');
+                } }]
             );
         } catch (error) {
             console.error('Error al crear comercio:', error);

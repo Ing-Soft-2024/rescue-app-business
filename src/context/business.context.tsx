@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useClientFetch } from "../hooks/fetch.hook";
 import { userBusinessConsumer } from "../services/client";
 import { Business } from "../types/business.type";
@@ -6,6 +6,7 @@ import { useSession } from "./session.context";
 
 type BusinessContextType = {
     business: Business | undefined,
+    setBusiness: (business: Business) => void
 }
 
 export const BusinessContext = React.createContext<BusinessContextType | undefined>(undefined);
@@ -17,6 +18,7 @@ export const useBusiness = () => {
 
 export const BusinessProvider = ({ children }: { children: React.ReactNode }) => {
     const { session } = useSession();
+    const [businessState, setBusinessState] = useState<Business | undefined>(undefined);
     
     const { data: business } = useClientFetch({
         consumer: userBusinessConsumer,
@@ -28,9 +30,16 @@ export const BusinessProvider = ({ children }: { children: React.ReactNode }) =>
         }
     })
 
+    React.useEffect(() => {
+        if (business) {
+            setBusinessState(business);
+        }
+    }, [business]);
+
     return (
         <BusinessContext.Provider value={{
-            business
+            business: businessState,
+            setBusiness: setBusinessState
         }} >
             {children}
         </BusinessContext.Provider>
