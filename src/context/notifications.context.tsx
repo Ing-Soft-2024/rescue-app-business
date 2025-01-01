@@ -2,6 +2,7 @@ import React from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { orderConsumer } from '../services/client';
 import { useBusiness } from './business.context';
+import { NotificationsService } from '../services/notifications/notifications.service';
 
 export type OrderNotification = {
     id: number;
@@ -37,6 +38,19 @@ const NotificationsContext = React.createContext<NotificationsContextType>({
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
     const [notifications, setNotifications] = React.useState<OrderNotification[]>([]);
     const { business } = useBusiness();
+
+    // Initialize notifications service
+    React.useEffect(() => {
+        NotificationsService.initialize();
+    }, []);
+
+    // Handle new orders
+    const handleNewOrder = React.useCallback(async (newOrder: OrderNotification) => {
+        NotificationsService.scheduleNotification(
+            'Nuevo Pedido',
+            `Pedido #${newOrder.id} recibido por $${newOrder.totalPrice}`
+        );
+    }, []);
 
     const loadReadStatus = async () => {
         if (!business?.id) return;
@@ -82,12 +96,9 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
         try {
             const orders = await orderConsumer.consume('GET', {
-                queryParams: {
-                    businessId: business.id
-                }
+                params: { businessId: business.id }
             });
 
-            // Load saved read status before processing new orders
             const savedStatus = await SecureStore.getItemAsync(
                 `notifications_read_status_${business.id}`
             );
@@ -105,11 +116,20 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
                     isRead: readStatus[order.id] || false
                 }));
 
-            setNotifications(pendingOrders); // Replace instead of merge
+            // Check for new orders
+            const newOrders = pendingOrders.filter(
+                (order: OrderNotification) => 
+                    !notifications.some(n => n.id === order.id)
+            );
+
+            // Trigger notifications for new orders
+            newOrders.forEach(handleNewOrder);
+
+            setNotifications(pendingOrders);
         } catch (error) {
             console.error('Error fetching orders:', error);
         }
-    }, [business?.id]);
+    }, [business?.id, notifications, handleNewOrder]);
 
     // Load read status when business changes
     React.useEffect(() => {
@@ -125,7 +145,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         if (notifications.length > 0) {
             saveReadStatus();
         }
-    }, [notifications, business?.id]);
+    }, [notifications]);
 
     const markAsRead = async (id: number) => {
         setNotifications(prev =>
@@ -133,7 +153,6 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
                 notif.id === id ? { ...notif, isRead: true } : notif
             )
         );
-        // Save immediately after marking as read
         await saveReadStatus();
     };
 
@@ -141,7 +160,6 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
         setNotifications(prev =>
             prev.map(notif => ({ ...notif, isRead: true }))
         );
-        // Save immediately after marking all as read
         await saveReadStatus();
     };
 
