@@ -51,8 +51,7 @@
         "expo-notifications",
         {
           "icon": "./assets/images/reskue-logo.png",
-          "color": "#ffffff",
-          "sounds": ["./assets/notification-sound.wav"]
+          "color": "#ffffff"
         }
       ]
     ],
