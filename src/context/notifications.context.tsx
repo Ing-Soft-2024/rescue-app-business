@@ -116,20 +116,20 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
                     isRead: readStatus[order.id] || false
                 }));
 
-            // Check for new orders
-            const newOrders = pendingOrders.filter(
-                (order: OrderNotification) => 
-                    !notifications.some(n => n.id === order.id)
-            );
-
-            // Trigger notifications for new orders
-            newOrders.forEach(handleNewOrder);
-
-            setNotifications(pendingOrders);
+            setNotifications(currentNotifications => {
+                const newOrders = pendingOrders.filter(
+                    (order: OrderNotification) => 
+                        !currentNotifications.some(n => n.id === order.id)
+                );
+                
+                newOrders.forEach(handleNewOrder);
+                
+                return pendingOrders;
+            });
         } catch (error) {
             console.error('Error fetching orders:', error);
         }
-    }, [business?.id, notifications, handleNewOrder]);
+    }, [business?.id, handleNewOrder]);
 
     // Load read status when business changes
     React.useEffect(() => {
