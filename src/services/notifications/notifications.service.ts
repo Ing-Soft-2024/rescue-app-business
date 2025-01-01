@@ -1,25 +1,13 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import * as TaskManager from 'expo-task-manager';
 
-const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
-
-// Register background task
-TaskManager.defineTask(BACKGROUND_NOTIFICATION_TASK, ({ data, error, executionInfo }) => {
-    if (error) {
-        console.error('Background task error:', error);
-        return;
-    }
-    // Handle the notification data
-    if (data) {
-        const { title, body } = data.notification?.request?.content || {};
-        if (title && body) {
-            Notifications.scheduleNotificationAsync({
-                content: { title, body, sound: 'default' },
-                trigger: null,
-            });
-        }
-    }
+// Configure notifications behavior for both foreground and background
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+    }),
 });
 
 export class NotificationsService {
@@ -28,7 +16,14 @@ export class NotificationsService {
         let finalStatus = existingStatus;
 
         if (existingStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync();
+            const { status } = await Notifications.requestPermissionsAsync({
+                ios: {
+                    allowAlert: true,
+                    allowBadge: true,
+                    allowSound: true,
+                    allowAnnouncements: true,
+                },
+            });
             finalStatus = status;
         }
 
@@ -36,23 +31,15 @@ export class NotificationsService {
             return false;
         }
 
-        // Configure notification handling
-        Notifications.setNotificationHandler({
-            handleNotification: async () => ({
-                shouldShowAlert: true,
-                shouldPlaySound: true,
-                shouldSetBadge: true,
-            }),
-        });
-
-        // Register for background notifications
-        await Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
-
         if (Platform.OS === 'android') {
-            Notifications.setNotificationChannelAsync('default', {
+            await Notifications.setNotificationChannelAsync('default', {
                 name: 'default',
                 importance: Notifications.AndroidImportance.MAX,
                 vibrationPattern: [0, 250, 250, 250],
+                enableVibrate: true,
+                enableLights: true,
+                lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+                bypassDnd: true,
             });
         }
 
@@ -65,7 +52,9 @@ export class NotificationsService {
                 content: {
                     title,
                     body,
-                    sound: 'default',
+                    sound: true,
+                    priority: Notifications.AndroidNotificationPriority.MAX,
+                    data: { data: 'goes here' },
                 },
                 trigger: null,
             });
