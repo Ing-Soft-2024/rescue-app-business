@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, Alert, View, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import { useBusiness } from '@/src/context/business.context';
+import { NO_INTERNET_MESSAGE } from '@/src/utils/networkUtils';
+import { checkInternetConnection } from '@/src/utils/networkUtils';
 
 export default function RegisterScreen() {
     const { session } = useSession();
@@ -95,6 +97,11 @@ export default function RegisterScreen() {
     };
 
     const handleRegister = async () => {
+        if (!checkInternetConnection()) {
+            Alert.alert(NO_INTERNET_MESSAGE);
+            return;
+        }
+
         try {
             if (!validateInputs()) {
                 Alert.alert(

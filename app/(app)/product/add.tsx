@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { useBusiness } from "@/src/context/business.context";
 import StorageController from "@/src/services/storage/controller/storage.controller";
+import { checkInternetConnection, NO_INTERNET_MESSAGE } from '@/src/utils/networkUtils';
 
 const CATEGORIES = [
     { id: 1, name: 'Comida' },
@@ -83,6 +84,12 @@ export default function ProductPage() {
 
         setIsLoading(true);
         try {
+            const isConnected = await checkInternetConnection();
+            if (!isConnected) {
+                Alert.alert("Error de conexión", NO_INTERNET_MESSAGE);
+                return;
+            }
+
             // Upload image
             const uploadedImageUrl = await StorageController.upload(image, imageBase64);
             if (!uploadedImageUrl) {
@@ -106,7 +113,10 @@ export default function ProductPage() {
             }
         } catch (error) {
             console.error(error);
-            Alert.alert("Error", "Error al guardar el producto");
+            Alert.alert(
+                "Error",
+                "Error al guardar el producto. Por favor, intenta nuevamente."
+            );
         } finally {
             setIsLoading(false);
         }

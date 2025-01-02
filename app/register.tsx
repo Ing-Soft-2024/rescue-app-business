@@ -1,6 +1,7 @@
 import { registerConsumer } from '@/src/services/client';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { checkInternetConnection, NO_INTERNET_MESSAGE } from '@/src/utils/networkUtils';
 import {
     Keyboard,
     KeyboardAvoidingView,
@@ -48,6 +49,17 @@ export default function RegisterScreen() {
     };
 
     const handleRegister = async () => {
+        if (!checkInternetConnection()) {
+            setErrors({
+                firstName: NO_INTERNET_MESSAGE,
+                lastName: NO_INTERNET_MESSAGE,
+                email: NO_INTERNET_MESSAGE,
+                password: NO_INTERNET_MESSAGE,
+            });
+            setIsLoading(false);
+            return;
+        }   
+
         setErrors({
             firstName: '',
             lastName: '',
@@ -97,6 +109,12 @@ export default function RegisterScreen() {
 
         setIsLoading(true);
         try {
+            const isConnected = await checkInternetConnection();
+            if (!isConnected) {
+                Alert.alert("Error de conexión", NO_INTERNET_MESSAGE);
+                return;
+            }
+
             const response = await registerConsumer.consume('POST', {
                 data: {
                     firstName,

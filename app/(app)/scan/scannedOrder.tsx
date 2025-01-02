@@ -1,8 +1,10 @@
 import { orderDetailsConsumer } from "@/src/services/client";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { ProductItem } from "../../../src/components/productItem";
+import { checkInternetConnection } from "@/src/utils/networkUtils";
+import { NO_INTERNET_MESSAGE } from "@/src/utils/networkUtils";
 
 export default function ScannedOrderPage() {
     const param = useLocalSearchParams();
@@ -11,6 +13,11 @@ export default function ScannedOrderPage() {
 
 
     const confirmOrder = async () => {
+        if (!checkInternetConnection()) {
+            Alert.alert(NO_INTERNET_MESSAGE);
+            return;
+        }
+
         const id = param.id;
         if(!id) return;
         await orderDetailsConsumer.consume("PATCH", { params: { id }, data: { status: "scanned" } })

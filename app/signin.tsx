@@ -1,5 +1,7 @@
 import { useSession } from '@/src/context/session.context';
 import { userBusinessConsumer } from '@/src/services/client';
+import { NO_INTERNET_MESSAGE } from '@/src/utils/networkUtils';
+import { checkInternetConnection } from '@/src/utils/networkUtils';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, ActivityIndicator, Alert } from "react-native";
@@ -25,14 +27,19 @@ export default function AuthLayout() {
         setIsLoading(true);
         setError(''); // Clear previous errors
 
-        // Basic validation
-        if (!email.trim() || !password.trim()) {
-            setError('Por favor, complete todos los campos');
-            setIsLoading(false);
-            return;
-        }
-
         try {
+            const isConnected = await checkInternetConnection();
+            if (!isConnected) {
+                setError(NO_INTERNET_MESSAGE);
+                return;
+            }
+
+            // Basic validation
+            if (!email.trim() || !password.trim()) {
+                setError('Por favor, complete todos los campos');
+                return;
+            }
+
             const session = await signInWith("Credentials", {
                 email: email.trim(),
                 password: password
@@ -51,12 +58,8 @@ export default function AuthLayout() {
             }
         } catch (error: any) {
             console.error('Login error:', error);
-            
-            // Handle different types of errors
             if (error.message?.includes('401')) {
                 setError('Credenciales inválidas. Por favor, verifique su email y contraseña.');
-            } else if (error.message?.includes('Network')) {
-                setError('Error de conexión. Por favor, verifique su conexión a internet.');
             } else {
                 setError('El mail o la contraseña son incorrectos.');
             }
