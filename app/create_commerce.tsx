@@ -14,18 +14,20 @@ export default function RegisterScreen() {
     const { setBusiness } = useBusiness();
 
     const [name, setName] = useState('');
-    const [address, setAddress] = useState('');
+    const [streetName, setStreetName] = useState('');
+    const [streetNumber, setStreetNumber] = useState('');
     const [city, setCity] = useState('');
-    const [state, setState] = useState('');
+    const [country, setCountry] = useState('');
     const [coordinates, setCoordinates] = useState<{
         latitude: number;
         longitude: number;
     } | null>(null);
     const [errors, setErrors] = useState({
         name: false,
-        address: false,
+        streetName: false,
+        streetNumber: false,
         city: false,
-        state: false
+        country: false
     });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -38,13 +40,13 @@ export default function RegisterScreen() {
     const validateInputs = () => {
         const newErrors = {
             name: name.trim() === '',
-            address: address.trim() === '',
+            streetName: streetName.trim() === '',
+            streetNumber: streetNumber.trim() === '',
             city: city.trim() === '',
-            state: state.trim() === ''
+            country: country.trim() === ''
         };
 
         setErrors(newErrors);
-
         return !Object.values(newErrors).some(error => error);
     };
 
@@ -69,32 +71,42 @@ export default function RegisterScreen() {
             });
 
             if (addressInfo) {
-                setAddress(addressInfo.street || '');
+                // Split street into number and name if possible
+                const streetParts = (addressInfo.street || '').split(' ');
+                const possibleNumber = streetParts[0];
+                
+                if (!isNaN(Number(possibleNumber))) {
+                    setStreetNumber(possibleNumber);
+                    setStreetName(streetParts.slice(1).join(' '));
+                } else {
+                    setStreetName(addressInfo.street || '');
+                }
+                
                 setCity(addressInfo.city || '');
-                setState(addressInfo.region || '');
+                setCountry(addressInfo.country || '');
             }
         } catch (error) {
             Alert.alert('Error', 'Could not get current location');
         }
     };
 
-    const getCoordinatesFromAddress = async () => {
-        try {
-            const fullAddress = `${address},${state}, Argentina`;
-            const results = await Location.geocodeAsync(fullAddress);
+    // const getCoordinatesFromAddress = async () => {
+    //     try {
+    //         const fullAddress = `${address},${state}, Argentina`;
+    //         const results = await Location.geocodeAsync(fullAddress);
 
-            if (results.length > 0) {
-                setCoordinates({
-                    latitude: results[0].latitude,
-                    longitude: results[0].longitude
-                });
-            } else {
-                Alert.alert('Error', 'Could not find coordinates for this address');
-            }
-        } catch (error) {
-            Alert.alert('Error', 'Could not get coordinates from address');
-        }
-    };
+    //         if (results.length > 0) {
+    //             setCoordinates({
+    //                 latitude: results[0].latitude,
+    //                 longitude: results[0].longitude
+    //             });
+    //         } else {
+    //             Alert.alert('Error', 'Could not find coordinates for this address');
+    //         }
+    //     } catch (error) {
+    //         Alert.alert('Error', 'Could not get coordinates from address');
+    //     }
+    // };
 
     const handleRegister = async () => {
         if (!checkInternetConnection()) {
@@ -113,29 +125,39 @@ export default function RegisterScreen() {
 
             setIsLoading(true);
 
-            if (!coordinates) {
-                await getCoordinatesFromAddress();
+            // if (!coordinates) {
+            //     await getCoordinatesFromAddress();
+            // }
+
+            // if (!coordinates) {
+            //     Alert.alert('Error', 'No se pudo determinar la ubicación');
+            //     return;
+            // }
+
+            try {
+                const commerce = await commerceConsumer.consume('POST', {
+                    data: {
+                        userId: session?.user.id,
+                        name: name.trim(),
+                        address: `${streetNumber.trim()} ${streetName.trim()}`,
+                        city: city.trim(),
+                        country: country.trim()
+                    }
+                });
+                setBusiness(commerce);
+                setStreetName(commerce.streetName || '');
+                setStreetNumber(commerce.streetNumber || '');
+                setCity(commerce.city || '');
+                setCountry(commerce.country || '');
+            } catch (error) {
+                console.error('Error al crear comercio:', error);
+                Alert.alert(
+                    "Error",
+                    "Hubo un error al crear el comercio. Por favor, intente nuevamente."
+                );
             }
 
-            if (!coordinates) {
-                Alert.alert('Error', 'No se pudo determinar la ubicación');
-                return;
-            }
-
-            const commerce = await commerceConsumer.consume('POST', {
-                data: {
-                    userId: session?.user.id,
-                    name: name.trim(),
-                    country: "Argentina",
-                    address: address.trim(),
-                    city: city.trim(),
-                    state: state.trim(),
-                    latitude: coordinates.latitude,
-                    longitude: coordinates.longitude
-                }
-            });
-
-            setBusiness(commerce);
+            
 
             Alert.alert(
                 "Éxito",
@@ -176,17 +198,29 @@ export default function RegisterScreen() {
                     <Text style={styles.errorText}>El nombre es requerido</Text>
                 )}
 
-                <TextInput
-                    placeholder="Dirección"
-                    value={address}
-                    onChangeText={setAddress}
-                    style={[
-                        styles.input,
-                        errors.address && styles.inputError
-                    ]}
-                />
-                {errors.address && (
-                    <Text style={styles.errorText}>La dirección es requerida</Text>
+                <View style={styles.addressContainer}>
+                    <TextInput
+                        placeholder="Número"
+                        value={streetNumber}
+                        onChangeText={setStreetNumber}
+                        keyboardType="numeric"
+                        style={[
+                            styles.numberInput,
+                            errors.streetNumber && styles.inputError
+                        ]}
+                    />
+                    <TextInput
+                        placeholder="Calle"
+                        value={streetName}
+                        onChangeText={setStreetName}
+                        style={[
+                            styles.streetInput,
+                            errors.streetName && styles.inputError
+                        ]}
+                    />
+                </View>
+                {(errors.streetName || errors.streetNumber) && (
+                    <Text style={styles.errorText}>La dirección completa es requerida</Text>
                 )}
 
                 <TextInput
@@ -203,16 +237,16 @@ export default function RegisterScreen() {
                 )}
 
                 <TextInput
-                    placeholder="Estado/Provincia"
-                    value={state}
-                    onChangeText={setState}
+                    placeholder="País"
+                    value={country}
+                    onChangeText={setCountry}
                     style={[
                         styles.input,
-                        errors.state && styles.inputError
+                        errors.country && styles.inputError
                     ]}
                 />
-                {errors.state && (
-                    <Text style={styles.errorText}>La provincia es requerida</Text>
+                {errors.country && (
+                    <Text style={styles.errorText}>El país es requerido</Text>
                 )}
 
                 <Pressable 
@@ -324,5 +358,30 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#666',
         marginVertical: 10,
+    },
+    addressContainer: {
+        flexDirection: 'row',
+        gap: 10,
+        marginBottom: 15,
+    },
+    numberInput: {
+        flex: 1,
+        backgroundColor: 'white',
+        padding: 15,
+        borderRadius: 5,
+        fontSize: 16,
+        shadowColor: 'black',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 1 },
+    },
+    streetInput: {
+        flex: 3,
+        backgroundColor: 'white',
+        padding: 15,
+        borderRadius: 5,
+        fontSize: 16,
+        shadowColor: 'black',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 1 },
     }
 });
