@@ -8,6 +8,32 @@ import * as Location from 'expo-location';
 import { useBusiness } from '@/src/context/business.context';
 import { NO_INTERNET_MESSAGE } from '@/src/utils/networkUtils';
 import { checkInternetConnection } from '@/src/utils/networkUtils';
+import { Picker } from '@react-native-picker/picker';
+
+const COUNTRIES = {
+  'Argentina': [
+    'Buenos Aires',
+    'Córdoba',
+    'Rosario',
+    'Mendoza',
+    'San Miguel de Tucumán',
+    'La Plata',
+    'Mar del Plata',
+    'Salta',
+    // Add more cities as needed
+  ],
+  'United States': [
+    'New York',
+    'Los Angeles',
+    'Chicago',
+    'Houston',
+    'Phoenix',
+    'Philadelphia',
+    'San Antonio',
+    'San Diego',
+    // Add more cities as needed
+  ]
+};
 
 export default function RegisterScreen() {
     const { session } = useSession();
@@ -17,7 +43,7 @@ export default function RegisterScreen() {
     const [streetName, setStreetName] = useState('');
     const [streetNumber, setStreetNumber] = useState('');
     const [city, setCity] = useState('');
-    const [country, setCountry] = useState('');
+    const [country, setCountry] = useState('Argentina');
     const [coordinates, setCoordinates] = useState<{
         latitude: number;
         longitude: number;
@@ -141,7 +167,9 @@ export default function RegisterScreen() {
                         name: name.trim(),
                         address: `${streetNumber.trim()} ${streetName.trim()}`,
                         city: city.trim(),
-                        country: country.trim()
+                        country: country.trim(),
+                        latitude: coordinates?.latitude,
+                        longitude: coordinates?.longitude
                     }
                 });
                 setBusiness(commerce);
@@ -176,6 +204,8 @@ export default function RegisterScreen() {
             setIsLoading(false);
         }
     };
+
+    const availableCities = COUNTRIES[country as keyof typeof COUNTRIES] || [];
 
     return (
         <ScrollView style={styles.scrollView}>
@@ -223,30 +253,37 @@ export default function RegisterScreen() {
                     <Text style={styles.errorText}>La dirección completa es requerida</Text>
                 )}
 
-                <TextInput
-                    placeholder="Ciudad"
-                    value={city}
-                    onChangeText={setCity}
-                    style={[
-                        styles.input,
-                        errors.city && styles.inputError
-                    ]}
-                />
-                {errors.city && (
-                    <Text style={styles.errorText}>La ciudad es requerida</Text>
-                )}
-
-                <TextInput
-                    placeholder="País"
-                    value={country}
-                    onChangeText={setCountry}
-                    style={[
-                        styles.input,
-                        errors.country && styles.inputError
-                    ]}
-                />
+                <View style={[styles.pickerContainer, errors.country && styles.inputError]}>
+                    <Picker
+                        selectedValue={country}
+                        onValueChange={(itemValue) => {
+                            setCountry(itemValue);
+                            setCity(''); // Reset city when country changes
+                        }}
+                        style={styles.picker}
+                    >
+                        <Picker.Item label="Argentina" value="Argentina" />
+                        <Picker.Item label="United States" value="United States" />
+                    </Picker>
+                </View>
                 {errors.country && (
                     <Text style={styles.errorText}>El país es requerido</Text>
+                )}
+
+                <View style={[styles.pickerContainer, errors.city && styles.inputError]}>
+                    <Picker
+                        selectedValue={city}
+                        onValueChange={(itemValue) => setCity(itemValue)}
+                        style={styles.picker}
+                    >
+                        <Picker.Item label="Seleccionar ciudad" value="" />
+                        {availableCities.map((cityName) => (
+                            <Picker.Item key={cityName} label={cityName} value={cityName} />
+                        ))}
+                    </Picker>
+                </View>
+                {errors.city && (
+                    <Text style={styles.errorText}>La ciudad es requerida</Text>
                 )}
 
                 <Pressable 
@@ -383,5 +420,17 @@ const styles = StyleSheet.create({
         shadowColor: 'black',
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 1 },
-    }
+    },
+    pickerContainer: {
+        backgroundColor: 'white',
+        borderRadius: 5,
+        marginBottom: 15,
+        shadowColor: 'black',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 1 },
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+    },
 });
