@@ -9,6 +9,7 @@ import { useBusiness } from '@/src/context/business.context';
 import { NO_INTERNET_MESSAGE } from '@/src/utils/networkUtils';
 import { checkInternetConnection } from '@/src/utils/networkUtils';
 import { Picker } from '@react-native-picker/picker';
+import { debounce } from 'lodash';
 
 const COUNTRIES = {
   'Argentina': [
@@ -35,6 +36,12 @@ const COUNTRIES = {
   ]
 };
 
+type AddressSuggestion = {
+    street: string;
+    city: string;
+    region: string;
+};
+
 export default function RegisterScreen() {
     const { session } = useSession();
     const { setBusiness } = useBusiness();
@@ -56,6 +63,8 @@ export default function RegisterScreen() {
         country: false
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [streetSuggestions, setStreetSuggestions] = useState<AddressSuggestion[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     const router = useRouter();
 
@@ -207,6 +216,54 @@ export default function RegisterScreen() {
 
     const availableCities = COUNTRIES[country as keyof typeof COUNTRIES] || [];
 
+    const fetchAddressSuggestions = debounce(async (text: string) => {
+        if (!text || text.length < 3) {
+            setStreetSuggestions([]);
+            return;
+        }
+
+        try {
+            const searchAddress = `${text}, ${city}, ${country}`;
+            const results = await Location.geocodeAsync(searchAddress);
+            
+            if (results.length > 0) {
+                const suggestions = await Promise.all(
+                    results.map(async (result) => {
+                        const [address] = await Location.reverseGeocodeAsync({
+                            latitude: result.latitude,
+                            longitude: result.longitude,
+                        });
+                        return {
+                            street: address.street || '',
+                            city: address.city || '',
+                            region: address.region || '',
+                        };
+                    })
+                );
+
+                setStreetSuggestions(suggestions);
+                setShowSuggestions(true);
+            }
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+            setStreetSuggestions([]);
+        }
+    }, 500);
+
+    const handleSuggestionSelect = (suggestion: AddressSuggestion) => {
+        const streetParts = suggestion.street.split(' ');
+        const possibleNumber = streetParts[0];
+        
+        if (!isNaN(Number(possibleNumber))) {
+            setStreetNumber(possibleNumber);
+            setStreetName(streetParts.slice(1).join(' '));
+        } else {
+            setStreetName(suggestion.street);
+        }
+        
+        setShowSuggestions(false);
+    };
+
     return (
         <ScrollView style={styles.scrollView}>
             <KeyboardAvoidingView
@@ -228,32 +285,7 @@ export default function RegisterScreen() {
                     <Text style={styles.errorText}>El nombre es requerido</Text>
                 )}
 
-                <View style={styles.addressContainer}>
-                    <TextInput
-                        placeholder="Número"
-                        value={streetNumber}
-                        onChangeText={setStreetNumber}
-                        keyboardType="numeric"
-                        style={[
-                            styles.numberInput,
-                            errors.streetNumber && styles.inputError
-                        ]}
-                    />
-                    <TextInput
-                        placeholder="Calle"
-                        value={streetName}
-                        onChangeText={setStreetName}
-                        style={[
-                            styles.streetInput,
-                            errors.streetName && styles.inputError
-                        ]}
-                    />
-                </View>
-                {(errors.streetName || errors.streetNumber) && (
-                    <Text style={styles.errorText}>La dirección completa es requerida</Text>
-                )}
-
-                <View style={[styles.pickerContainer, errors.country && styles.inputError]}>
+<View style={[styles.pickerContainer, errors.country && styles.inputError]}>
                     <Picker
                         selectedValue={country}
                         onValueChange={(itemValue) => {
@@ -286,6 +318,56 @@ export default function RegisterScreen() {
                     <Text style={styles.errorText}>La ciudad es requerida</Text>
                 )}
 
+
+                <View style={styles.addressContainer}>
+                    <TextInput
+                        placeholder="Número"
+                        value={streetNumber}
+                        onChangeText={setStreetNumber}
+                        keyboardType="numeric"
+                        style={[
+                            styles.numberInput,
+                            errors.streetNumber && styles.inputError
+                        ]}
+                    />
+                    <View style={styles.streetInputContainer}>
+                        <TextInput
+                            placeholder="Calle"
+                            value={streetName}
+                            onChangeText={(text) => {
+                                setStreetName(text);
+                                fetchAddressSuggestions(text);
+                            }}
+                            style={[
+                                styles.streetInput,
+                                errors.streetName && styles.inputError
+                            ]}
+                        />
+                        {showSuggestions && streetSuggestions.length > 0 && (
+                            <View style={styles.suggestionsContainer}>
+                                {streetSuggestions.map((suggestion, index) => (
+                                    <Pressable
+                                        key={index}
+                                        style={styles.suggestionItem}
+                                        onPress={() => handleSuggestionSelect(suggestion)}
+                                    >
+                                        <Text style={styles.suggestionText}>
+                                            {suggestion.street}
+                                        </Text>
+                                        <Text style={styles.suggestionSubtext}>
+                                            {suggestion.city}, {suggestion.region}
+                                        </Text>
+                                    </Pressable>
+                                ))}
+                            </View>
+                        )}
+                    </View>
+                </View>
+                {(errors.streetName || errors.streetNumber) && (
+                    <Text style={styles.errorText}>La dirección completa es requerida</Text>
+                )}
+
+               
                 <Pressable 
                     style={styles.locationButton} 
                     onPress={getCurrentLocation}
@@ -432,5 +514,37 @@ const styles = StyleSheet.create({
     picker: {
         height: 50,
         width: '100%',
+    },
+    streetInputContainer: {
+        flex: 3,
+        position: 'relative',
+    },
+    suggestionsContainer: {
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        right: 0,
+        backgroundColor: 'white',
+        borderRadius: 5,
+        marginTop: 5,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        zIndex: 1000,
+        maxHeight: 200,
+    },
+    suggestionItem: {
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    suggestionText: {
+        fontSize: 16,
+    },
+    suggestionSubtext: {
+        fontSize: 12,
+        color: '#666',
     },
 });
