@@ -19,7 +19,9 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://varied-laurella-rescue-bafbd5dd.koyeb.app"
+        "EXPO_PUBLIC_API_URL": "https://varied-laurella-rescue-bafbd5dd.koyeb.app",
+        "EXPO_PUBLIC_MP_CLIENT_ID": "2381168209109958",
+        "EXPO_PUBLIC_MP_REDIRECT_URI": "https://varied-laurella-rescue-bafbd5dd.koyeb.app/auth/mercadopago"
       }
     },
     "production": {}

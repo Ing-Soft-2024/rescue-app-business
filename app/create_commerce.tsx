@@ -160,15 +160,6 @@ export default function RegisterScreen() {
 
             setIsLoading(true);
 
-            // if (!coordinates) {
-            //     await getCoordinatesFromAddress();
-            // }
-
-            // if (!coordinates) {
-            //     Alert.alert('Error', 'No se pudo determinar la ubicación');
-            //     return;
-            // }
-
             try {
                 const commerce = await commerceConsumer.consume('POST', {
                     data: {
@@ -181,11 +172,35 @@ export default function RegisterScreen() {
                         longitude: coordinates?.longitude
                     }
                 });
-                setBusiness(commerce);
-                setStreetName(commerce.streetName || '');
-                setStreetNumber(commerce.streetNumber || '');
-                setCity(commerce.city || '');
-                setCountry(commerce.country || '');
+                
+                // Wait for business context to update
+                await setBusiness(commerce);
+
+                Alert.alert(
+                    "Éxito",
+                    "Comercio creado exitosamente. ¿Desea conectar con Mercado Pago?",
+                    [
+                        {
+                            text: "Conectar",
+                            onPress: async () => {
+                                // Ensure business is set before navigating
+                                if (commerce?.id) {
+                                    router.push({
+                                        pathname: '/(app)/',
+                                        params: {
+                                            showMPConnect: 'true'
+                                        }
+                                    });
+                                }
+                            }
+                        },
+                        {
+                            text: "Más tarde",
+                            onPress: () => router.replace('/(app)/')
+                        }
+                    ]
+                );
+
             } catch (error) {
                 console.error('Error al crear comercio:', error);
                 Alert.alert(
@@ -193,16 +208,6 @@ export default function RegisterScreen() {
                     "Hubo un error al crear el comercio. Por favor, intente nuevamente."
                 );
             }
-
-            
-
-            Alert.alert(
-                "Éxito",
-                "Comercio creado exitosamente",
-                [{ text: "OK", onPress: () => {
-                    router.replace('/(app)/');
-                } }]
-            );
         } catch (error) {
             console.error('Error al crear comercio:', error);
             Alert.alert(

@@ -6,24 +6,25 @@ import { useSession } from "@/src/context/session.context";
 import { useClientFetch } from "@/src/hooks/fetch.hook";
 import { commerceDetailsConsumer, productConsumer } from "@/src/services/client";
 import { ProductType } from "@/src/types/product.type";
-import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { Button, FlatList, RefreshControl, Text } from "react-native";
+import { ConnectCommerce } from "@/src/components/mercadopago/connectCommerce";
 
 export default function ProductPage() {
     const { signOut } = useSession();
     const { business } = useBusiness();
-
-    const params = React.useMemo(() => ({
-        id: business?.id,
-        refresh: false
-    }), [business?.id]);
+    const params = useLocalSearchParams();
+    const showMPConnect = params.showMPConnect === 'true';
+    const router = useRouter();
 
     const { data: commerceDetails, loading, error, reload } = useClientFetch({
         consumer: commerceDetailsConsumer,
         method: 'GET',
         options: {
-            params,
+            params: {
+                id: business?.id
+            },
             enabled: !!business?.id
         }
     });
@@ -53,6 +54,14 @@ export default function ProductPage() {
     
     return (
         <>
+            {showMPConnect && business?.id && (
+                <ConnectCommerce 
+                    redirect_uri={process.env.EXPO_PUBLIC_MP_REDIRECT_URI!}
+                    onSuccess={() => {
+                        router.setParams({ showMPConnect: 'false' });
+                    }}
+                />
+            )}
             <FlatList
                 data={commerceDetails?.products?.sort((a: ProductType, b: ProductType) => {
                     return a.createdAt > b.createdAt ? -1 : 1;
