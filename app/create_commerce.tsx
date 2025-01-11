@@ -175,6 +175,8 @@ export default function RegisterScreen() {
                 
                 // Wait for business context to update
                 await setBusiness(commerce);
+                // Add a small delay to ensure context is updated
+                await new Promise(resolve => setTimeout(resolve, 100));
 
                 Alert.alert(
                     "Éxito",
@@ -183,9 +185,8 @@ export default function RegisterScreen() {
                         {
                             text: "Conectar",
                             onPress: async () => {
-                                // Ensure business is set before navigating
                                 if (commerce?.id) {
-                                    router.push({
+                                    router.replace({
                                         pathname: '/(app)/',
                                         params: {
                                             showMPConnect: 'true'

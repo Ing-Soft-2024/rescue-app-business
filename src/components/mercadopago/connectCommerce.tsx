@@ -2,7 +2,7 @@ import { mercadoPagoAuthConsumer } from "@/src/services/client";
 import { useSession } from "@/src/context/session.context";
 import { useBusiness } from "@/src/context/business.context";
 import { openAuthSessionAsync } from "expo-web-browser";
-import { Alert, Pressable, Text, StyleSheet } from "react-native";
+import { Alert, Pressable, Text, StyleSheet, View } from "react-native";
 import * as Linking from 'expo-linking';
 import { useEffect } from "react";
 
@@ -15,15 +15,19 @@ export const ConnectCommerce = ({ redirect_uri, onSuccess }: ConnectCommerceProp
     const { business } = useBusiness();
 
     useEffect(() => {
-        // Handle deep linking
         const subscription = Linking.addEventListener('url', ({ url }) => {
             if (url.includes('mercadopago/callback')) {
-                const success = url.includes('success=true');
-                if (success) {
+                const params = Linking.parse(url).queryParams;
+                if (params?.success === 'true') {
                     Alert.alert(
                         "Éxito",
                         "Conexión con Mercado Pago establecida correctamente",
                         [{ text: "OK", onPress: onSuccess }]
+                    );
+                } else {
+                    Alert.alert(
+                        "Error",
+                        (Array.isArray(params?.error) ? params?.error[0] : params?.error) || "No se pudo conectar con Mercado Pago"
                     );
                 }
             }
@@ -39,9 +43,13 @@ export const ConnectCommerce = ({ redirect_uri, onSuccess }: ConnectCommerceProp
                 return;
             }
 
-            const authUrl = `https://auth.mercadopago.com/authorization?client_id=${process.env.EXPO_PUBLIC_MP_CLIENT_ID}&response_type=code&platform_id=mp&redirect_uri=${encodeURIComponent(redirect_uri)}&state=${business.id}`;
+            // Make sure this matches exactly what's in your MP developer portal
+            const redirectUri = process.env.EXPO_PUBLIC_MP_REDIRECT_URI;
+            if (!redirectUri) throw new Error("Redirect URI not configured");
             
-            await openAuthSessionAsync(authUrl);
+            const authUrl = `https://auth.mercadopago.com/authorization?client_id=${process.env.EXPO_PUBLIC_MP_CLIENT_ID}&response_type=code&platform_id=mp&redirect_uri=${encodeURIComponent(redirectUri)}&state=${business.id?.toString()}`;
+            
+            await openAuthSessionAsync(authUrl, 'rescueapp-bussiness://');
         } catch (error) {
             console.error('Error en autenticación:', error);
             Alert.alert(
@@ -50,13 +58,25 @@ export const ConnectCommerce = ({ redirect_uri, onSuccess }: ConnectCommerceProp
             );
         }
     };
+    
+
 
     return (
-        <Pressable style={styles.connectButton} onPress={handleAuth}>
-            <Text style={styles.connectButtonText}>
-                Conectar con Mercado Pago
-            </Text>
-        </Pressable>
+        <View style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            padding: 20,
+            backgroundColor: 'white'
+        }}>
+            <Pressable style={styles.connectButton} onPress={handleAuth}>
+                <Text style={styles.connectButtonText}>
+                    Conectar con Mercado Pago
+                </Text>
+            </Pressable>
+        </View>
     );
 };
 
