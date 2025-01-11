@@ -108,7 +108,10 @@ export default function ProductPage() {
 
             if (response) {
                 Alert.alert("Éxito", "Producto guardado", [
-                    { text: "OK", onPress: () => router.dismissAll() }
+                    { 
+                        text: "OK", 
+                        onPress: () => router.push("/(app)")
+                    }
                 ]);
             }
         } catch (error) {

@@ -16,13 +16,25 @@ export default function AddProduct() {
         requestPermision();
     }, []);
 
+    React.useEffect(() => {
+        return () => {
+            if (cameraRef.current) {
+                cameraRef.current.pausePreview();
+            }
+        };
+    }, []);
+
     const wrapTakePhoto = async () => {
         setIsLoading(true);
         try {
             const result = await takePhoto();
             if (result) {
                 setImages(result.uri);
-                router.push({
+                // Unmount camera before navigation
+                if (cameraRef.current) {
+                    await cameraRef.current.pausePreview();
+                }
+                router.replace({
                     pathname: "/product/add",
                     params: {
                         imageUri: result.uri,
@@ -67,7 +79,7 @@ export default function AddProduct() {
                         gap: 5,
                         flexDirection: 'row',
                     })}
-                    onPress={router.back}
+                    onPress={() => router.back()}
                 >
                     <AntDesign name="arrowleft" size={24} color="white" />
                     <Text style={{ color: "white" }}>Volver</Text>
