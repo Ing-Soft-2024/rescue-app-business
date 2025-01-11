@@ -48,7 +48,7 @@ export default function ScanPage() {
                 left: 20,
                 zIndex: 10,
             }}>
-                <Pressable
+                {/* <Pressable
                     style={({ pressed }) => ({
                         backgroundColor: pressed ? '#3333' : '#0003',
                         padding: 10,
@@ -58,11 +58,11 @@ export default function ScanPage() {
                         gap: 5,
                         flexDirection: 'row',
                     })}
-                    onPress={router.back}
+                    onPress={() => router.push("/(app)")}
                 >
                     <AntDesign name="arrowleft" size={24} color="white" />
                     <Text style={{ color: "white" }}>Volver</Text>
-                </Pressable>
+                </Pressable> */}
             </View>
             <CameraView 
                 style={{
