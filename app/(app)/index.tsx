@@ -72,7 +72,7 @@ export default function ProductPage() {
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
             />
             <FloatingButton />
-            {/* <Button title="Add Product" onPress={tempAddProduct} /> */}
+             <Button title="Add Product" onPress={tempAddProduct} /> 
 
             <QRFloatingButton />
         </>

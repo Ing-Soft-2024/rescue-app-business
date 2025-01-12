@@ -20,11 +20,12 @@ export type OrderNotification = {
     }[];
 }
 
-type NotificationsContextType = {
+export type NotificationsContextType = {
     notifications: OrderNotification[];
     markAsRead: (id: number) => void;
     markAllAsRead: () => void;
     unreadCount: number;
+    refreshNotifications: () => Promise<void>;
 };
 
 const NotificationsContext = React.createContext<NotificationsContextType>({
@@ -32,6 +33,7 @@ const NotificationsContext = React.createContext<NotificationsContextType>({
     markAsRead: () => {},
     markAllAsRead: () => {},
     unreadCount: 0,
+    refreshNotifications: async () => {},
 });
 
 export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
@@ -94,7 +96,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
             const readStatus = savedStatus ? JSON.parse(savedStatus) : {};
 
             const pendingOrders = orders
-                .filter((order: any) => order.status === 'pending')
+                .filter((order: any) => ['pending', 'accepted'].includes(order.status))
                 .map((order: any) => ({
                     id: order.id,
                     status: order.status,
@@ -158,7 +160,8 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
             notifications,
             markAsRead,
             markAllAsRead,
-            unreadCount
+            unreadCount,
+            refreshNotifications: checkForNewOrders
         }}>
             {children}
         </NotificationsContext.Provider>

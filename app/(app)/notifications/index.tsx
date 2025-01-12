@@ -1,17 +1,54 @@
 import React from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useNotifications, OrderNotification } from '../../../src/context/notifications.context';
-import { router } from 'expo-router';
+import { router, useRouter } from 'expo-router';
+import { orderDetailsConsumer } from "@/src/services/client";
+import { checkInternetConnection, NO_INTERNET_MESSAGE } from "@/src/utils/networkUtils";
+import { Alert } from "react-native";
 
 export default function NotificationsScreen() {
-    const { notifications, markAsRead } = useNotifications();
+    const { notifications, markAsRead, refreshNotifications } = useNotifications();
+    const router = useRouter();
+
+    const handleAcceptOrder = async (orderId: number) => {
+        try {
+            const isConnected = await checkInternetConnection();
+            if (!isConnected) {
+                Alert.alert("Error de conexión", NO_INTERNET_MESSAGE);
+                return;
+            }
+
+            await orderDetailsConsumer.consume("PATCH", { 
+                params: { id: orderId }, 
+                data: { status: "accepted" } 
+            });
+            
+            // Refresh notifications after accepting
+            refreshNotifications();
+            
+            Alert.alert("Éxito", "Pedido aceptado correctamente");
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Error", "No se pudo aceptar el pedido");
+        }
+    };
 
     const handleNotificationPress = (notification: OrderNotification) => {
         markAsRead(notification.id);
-        // router.push({
-        //     pathname: '/scan/scannedOrder',
-        //     params: { id: notification.id }
-        // });
+    };
+
+    const renderActionButton = (notification: OrderNotification) => {
+        if (notification.status === "pending") {
+            return (
+                <Pressable
+                    style={styles.acceptButton}
+                    onPress={() => handleAcceptOrder(notification.id)}
+                >
+                    <Text style={styles.acceptButtonText}>Aceptar Pedido</Text>
+                </Pressable>
+            );
+        }
+        return null;
     };
 
     const formatCurrency = (amount: number) => {
@@ -93,6 +130,8 @@ export default function NotificationsScreen() {
                         <Text style={styles.time}>
                             {new Date(item.createdAt).toLocaleString()}
                         </Text>
+
+                        {renderActionButton(item)}
                     </Pressable>
                 )}
             />
@@ -169,6 +208,17 @@ const styles = StyleSheet.create({
     statusText: {
         color: 'white',
         fontSize: 12,
+        fontWeight: 'bold',
+    },
+    acceptButton: {
+        backgroundColor: '#4CAF50',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        alignItems: 'center',
+    },
+    acceptButtonText: {
+        color: 'white',
         fontWeight: 'bold',
     },
 });
