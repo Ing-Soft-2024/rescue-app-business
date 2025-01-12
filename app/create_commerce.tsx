@@ -85,14 +85,32 @@ export default function RegisterScreen() {
         return !Object.values(newErrors).some(error => error);
     };
 
+    const validateName = () => {
+        const hasError = name.trim() === '';
+        setErrors(prev => ({
+            ...prev,
+            name: hasError
+        }));
+        return !hasError;
+    };
+
     const getCurrentLocation = async () => {
         try {
+            if (!validateName()) {
+                Alert.alert(
+                    "Error de validación",
+                    "Por favor, ingrese el nombre del comercio."
+                );
+                return;
+            }
+
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 Alert.alert('Permission denied', 'Allow location access to continue');
                 return;
             }
 
+            setIsLoading(true);
             const location = await Location.getCurrentPositionAsync({});
             setCoordinates({
                 latitude: location.coords.latitude,
@@ -105,23 +123,76 @@ export default function RegisterScreen() {
                 longitude: location.coords.longitude
             });
 
-            if (addressInfo) {
-                // Split street into number and name if possible
-                const streetParts = (addressInfo.street || '').split(' ');
-                const possibleNumber = streetParts[0];
+            // if (addressInfo) {
+            //     // Set address information
+            //     const streetParts = (addressInfo.street || '').split(' ');
+            //     const possibleNumber = streetParts[0];
                 
-                if (!isNaN(Number(possibleNumber))) {
-                    setStreetNumber(possibleNumber);
-                    setStreetName(streetParts.slice(1).join(' '));
-                } else {
-                    setStreetName(addressInfo.street || '');
-                }
+            //     if (!isNaN(Number(possibleNumber))) {
+            //         setStreetNumber(possibleNumber);
+            //         setStreetName(streetParts.slice(1).join(' '));
+            //     } else {
+            //         setStreetName(addressInfo.street || '');
+            //     }
                 
-                setCity(addressInfo.city || '');
-                setCountry(addressInfo.country || '');
+            //     setCity(addressInfo.city || '');
+            //     setCountry(addressInfo.country || '');
+            // }
+
+            // Register commerce with current location
+            try {
+                const commerce = await commerceConsumer.consume('POST', {
+                    data: {
+                        userId: session?.user.id,
+                        name: name.trim(),
+                        // address: `${streetNumber.trim()} ${streetName.trim()}`,
+                        // city: city.trim(),
+                        // country: country.trim(),
+                        latitude: location.coords.latitude,
+                        longitude: location.coords.longitude
+                    }
+                });
+                
+                await setBusiness(commerce);
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                Alert.alert(
+                    "Éxito",
+                    "Comercio creado exitosamente. ¿Desea conectar con Mercado Pago?",
+                    [
+                        {
+                            text: "Conectar",
+                            onPress: async () => {
+                                if (commerce?.id) {
+                                    router.replace({
+                                        pathname: '/(app)/',
+                                        params: {
+                                            showMPConnect: 'true'
+                                        }
+                                    });
+                                }
+                            }
+                        },
+                        {
+                            text: "Más tarde",
+                            onPress: () => router.replace('/(app)/')
+                        }
+                    ]
+                );
+
+            } catch (error) {
+                console.error('Error al crear comercio:', error);
+                Alert.alert(
+                    "Error",
+                    "Hubo un error al crear el comercio. Por favor, intente nuevamente."
+                );
             }
+
         } catch (error) {
+            console.error('Error:', error);
             Alert.alert('Error', 'Could not get current location');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -290,7 +361,12 @@ export default function RegisterScreen() {
                 {errors.name && (
                     <Text style={styles.errorText}>El nombre es requerido</Text>
                 )}
-
+                <Pressable 
+                    style={styles.locationButton} 
+                    onPress={getCurrentLocation}
+                >
+                    <Text style={styles.locationButtonText}>Usar ubicación actual</Text>
+                </Pressable>
 <View style={[styles.pickerContainer, errors.country && styles.inputError]}>
                     <Picker
                         selectedValue={country}
@@ -374,12 +450,8 @@ export default function RegisterScreen() {
                 )}
 
                
-                <Pressable 
-                    style={styles.locationButton} 
-                    onPress={getCurrentLocation}
-                >
-                    <Text style={styles.locationButtonText}>Usar ubicación actual</Text>
-                </Pressable>
+                
+               
 
                 {coordinates && (
                     <Text style={styles.coordinatesText}>
