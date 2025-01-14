@@ -38,15 +38,23 @@ export default function ProductPage() {
     if (!business?.id) return <Text>Loading business...</Text>;
     if (error) return <Text>{error}</Text>;
 
-    async function tempAddProduct(): Promise<void> {
-        const response = await productConsumer.consume('POST', {
-            data: {
-                name: "Test",
-                description: "Test",
-                price: 100,
-                stock: 3,
-                businessId: business?.id,
-                categories: [1]
+    // async function tempAddProduct(): Promise<void> {
+    //     const response = await productConsumer.consume('POST', {
+    //         data: {
+    //             name: "Test",
+    //             description: "Test",
+    //             price: 100,
+    //             stock: 3,
+    //             businessId: business?.id,
+    //             categories: [1]
+    //         }
+    //     });
+    // }
+    function tempAddProduct(): void {
+        router.push({
+            "pathname": "/scan/scannedOrder",
+            "params": {
+                "id": 1
             }
         });
     }
@@ -72,7 +80,7 @@ export default function ProductPage() {
                 refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
             />
             <FloatingButton />
-             <Button title="Add Product" onPress={tempAddProduct} /> 
+             {/* <Button title="Add Product" onPress={tempAddProduct} />  */}
 
             <QRFloatingButton />
         </>
