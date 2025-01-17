@@ -43,13 +43,28 @@ export const ConnectCommerce = ({ redirect_uri, onSuccess }: ConnectCommerceProp
                 return;
             }
 
-            // Make sure this matches exactly what's in your MP developer portal
+            const clientId = process.env.EXPO_PUBLIC_MP_CLIENT_ID;
             const redirectUri = process.env.EXPO_PUBLIC_MP_REDIRECT_URI;
-            if (!redirectUri) throw new Error("Redirect URI not configured");
             
-            const authUrl = `https://auth.mercadopago.com/authorization?client_id=${process.env.EXPO_PUBLIC_MP_CLIENT_ID}&response_type=code&platform_id=mp&redirect_uri=${encodeURIComponent(redirectUri)}&state=${business.id?.toString()}`;
+            if (!clientId || !redirectUri) {
+                throw new Error("Missing MP configuration");
+            }
+
+            const state = encodeURIComponent(business.id.toString());
             
-            await openAuthSessionAsync(authUrl, 'rescueapp-bussiness://');
+            const authUrl = `https://auth.mercadopago.com/authorization?` + 
+                `client_id=${clientId}` +
+                `&response_type=code` +
+                `&platform_id=mp` +
+                `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+                `&state=${state}`;
+            
+            
+            // Specify the return URL that matches your deep linking configuration
+            await openAuthSessionAsync(
+                authUrl,
+                'rescueapp-business://MercadoPagoSuccessScreen'
+            );
         } catch (error) {
             console.error('Error en autenticación:', error);
             Alert.alert(
