@@ -184,7 +184,7 @@ export default function RegisterScreen() {
                 console.error('Error al crear comercio:', error);
                 Alert.alert(
                     "Error",
-                    "Hubo un error al crear el comercio. Por favor, intente nuevamente."
+                    "Hubo un error al crear el comercio: " + error
                 );
             }
 
