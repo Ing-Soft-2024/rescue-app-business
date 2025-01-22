@@ -10,6 +10,7 @@ import { NO_INTERNET_MESSAGE } from '@/src/utils/networkUtils';
 import { checkInternetConnection } from '@/src/utils/networkUtils';
 import { Picker } from '@react-native-picker/picker';
 import { debounce } from 'lodash';
+import { handleAuth } from '@/src/components/mercadopago/connectCommerce';
 
 const COUNTRIES = {
   'Argentina': [
@@ -164,12 +165,8 @@ export default function RegisterScreen() {
                             text: "Conectar",
                             onPress: async () => {
                                 if (commerce?.id) {
-                                    router.replace({
-                                        pathname: '/(app)/',
-                                        params: {
-                                            showMPConnect: 'true'
-                                        }
-                                    });
+                                    await handleAuth(commerce.id);
+                                    router.replace('/(app)/');
                                 }
                             }
                         },
@@ -257,12 +254,8 @@ export default function RegisterScreen() {
                             text: "Conectar",
                             onPress: async () => {
                                 if (commerce?.id) {
-                                    router.replace({
-                                        pathname: '/(app)/',
-                                        params: {
-                                            showMPConnect: 'true'
-                                        }
-                                    });
+                                    await handleAuth(commerce.id);
+                                    router.replace('/(app)/');
                                 }
                             }
                         },

@@ -15,7 +15,6 @@ export default function ProductPage() {
     const { signOut } = useSession();
     const { business } = useBusiness();
     const params = useLocalSearchParams();
-    const showMPConnect = params.showMPConnect === 'true';
     const router = useRouter();
 
     const { data: commerceDetails, loading, error, reload } = useClientFetch({
@@ -28,6 +27,8 @@ export default function ProductPage() {
             enabled: !!business?.id
         }
     });
+
+    const showConnectButton = !commerceDetails?.hasMercadoPago;
 
     useFocusEffect(React.useCallback(() => {
         if (params.refresh && business?.id) {
@@ -62,12 +63,10 @@ export default function ProductPage() {
     
     return (
         <>
-            {showMPConnect && business?.id && (
+            {showConnectButton && (
                 <ConnectCommerce 
                     redirect_uri={process.env.EXPO_PUBLIC_MP_REDIRECT_URI!}
-                    onSuccess={() => {
-                        router.setParams({ showMPConnect: 'false' });
-                    }}
+                    onSuccess={reload}
                 />
             )}
             <FlatList
