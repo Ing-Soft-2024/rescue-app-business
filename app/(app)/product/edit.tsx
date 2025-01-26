@@ -84,6 +84,7 @@ export default function EditProductPage() {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.label}>Nombre del producto</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Nombre"
@@ -91,14 +92,16 @@ export default function EditProductPage() {
                 onChangeText={text => setProduct(prev => ({ ...prev, name: text }))}
             />
 
+            <Text style={styles.label}>Descripción</Text>
             <TextInput
-                style={styles.input}
+                style={[styles.input, styles.multilineInput]}
                 placeholder="Descripción"
                 value={product.description}
                 onChangeText={text => setProduct(prev => ({ ...prev, description: text }))}
                 multiline
             />
 
+            <Text style={styles.label}>Precio</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Precio"
@@ -110,6 +113,7 @@ export default function EditProductPage() {
                 keyboardType="numeric"
             />
 
+            <Text style={styles.label}>Stock disponible</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Stock"
@@ -149,11 +153,23 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: 'white',
     },
+    label: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#666',
+        marginBottom: 8,
+        marginTop: 8,
+    },
+    multilineInput: {
+        minHeight: 100,
+        textAlignVertical: 'top',
+        paddingTop: 10,
+    },
     input: {
         borderWidth: 1,
         borderColor: '#ddd',
         padding: 10,
-        marginBottom: 10,
+        marginBottom: 15,
         borderRadius: 5,
     },
     button: {

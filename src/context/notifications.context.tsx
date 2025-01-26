@@ -88,6 +88,16 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
                     businessId: business.id
                 }
             });
+            
+            // Log the state of the last order if there are any orders
+            if (orders && orders.length > 0) {
+                const lastOrder = orders[0]; // Assuming orders are sorted with newest first
+                console.log('Last order status:', {
+                    orderId: lastOrder.id,
+                    status: lastOrder.status,
+                    createdAt: lastOrder.createdAt
+                });
+            }
 
             // Load saved read status before processing new orders
             const savedStatus = await SecureStore.getItemAsync(
@@ -96,7 +106,13 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
             const readStatus = savedStatus ? JSON.parse(savedStatus) : {};
 
             const pendingOrders = orders
-                .filter((order: any) => ['pending', 'accepted'].includes(order.status))
+                .filter((order: any) => [
+                    'pending',
+                    'accepted',
+                    'completed_cash',
+                    'completed_mercadopago',
+                    'scanned'
+                ].includes(order.status))
                 .map((order: any) => ({
                     id: order.id,
                     status: order.status,
@@ -149,7 +165,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
     // Set up polling interval for new orders
     React.useEffect(() => {
-        const interval = setInterval(checkForNewOrders, 60000); // Check every minute
+        const interval = setInterval(checkForNewOrders, 15000); // Check every minute
         return () => clearInterval(interval);
     }, [checkForNewOrders]);
 

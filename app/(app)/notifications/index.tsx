@@ -11,6 +11,7 @@ export default function NotificationsScreen() {
     const router = useRouter();
 
     const handleAcceptOrder = async (orderId: number) => {
+        markAsRead(orderId);
         try {
             const isConnected = await checkInternetConnection();
             if (!isConnected) {
@@ -62,10 +63,16 @@ export default function NotificationsScreen() {
         switch (status.toLowerCase()) {
             case 'pending':
                 return '#FFA500'; // Orange
-            case 'completed':
+            case 'completed_cash':
+                return '#4CAF50'; // Green
+            case 'completed_mercadopago':
                 return '#4CAF50'; // Green
             case 'cancelled':
                 return '#FF0000'; // Red
+            case 'accepted':
+                return '#2196F3'; // Blue
+            case 'scanned':
+                return '#FF9800'; // Dark Orange
             default:
                 return '#666666'; // Gray
         }
@@ -75,10 +82,16 @@ export default function NotificationsScreen() {
         switch (status.toLowerCase()) {
             case 'pending':
                 return 'Pendiente';
-            case 'completed':
-                return 'Completado';
+            case 'completed_cash':
+                return 'Pagado con efectivo';
+            case 'completed_mercadopago':
+                return 'Pagado con Mercado Pago';
             case 'cancelled':
                 return 'Cancelado';
+            case 'accepted':
+                return 'Aceptado';
+            case 'scanned':
+                return 'Pago Pendiente';
             default:
                 return status;
         }

@@ -18,7 +18,7 @@ export default function ScanPage() {
         console.log(params.data);
         if(!params.data) return;
         const url = params.data;
-        const isValidUrl = url.startsWith("rescueappbussiness://scan/scannedOrder?id=");
+        const isValidUrl = url.startsWith("rescueapp-bussiness://scan/scannedOrder?id=");
         if(!isValidUrl) return;
 
         const id = url.split("id=")[1];
