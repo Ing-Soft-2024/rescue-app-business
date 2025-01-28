@@ -1,4 +1,5 @@
-import { storageConsumer } from "../../client";
+import { imageCache } from '../cache/image.cache';
+import { storageConsumer } from '../../client';
 import * as FileSystem from 'expo-file-system';
 
 export default class StorageController {
@@ -46,6 +47,9 @@ export default class StorageController {
                 throw new Error('No response from server');
             }
 
+            // Cache the uploaded image immediately
+            await imageCache.cacheImage(response, finalBase64);
+
             return response;
 
         } catch (error) {
@@ -54,13 +58,25 @@ export default class StorageController {
         }
     }
 
-    static download = async (fileName: string): Promise<string> => {
-        if (!fileName) throw new StorageError('No file name Provided');
-        const base64File = await storageConsumer.consume("GET", {
-            queryParams: {
-                fileName: fileName
+    static async download(fileName: string): Promise<string> {
+        try {
+            // Check cache first
+            const cachedImage = await imageCache.getCachedImage(fileName);
+            if (cachedImage) {
+                return cachedImage;
             }
-        });
-        return `data:image/png;base64,${base64File}`;
+
+            // If not in cache, download and cache
+            const base64 = await storageConsumer.consume("GET", {
+                queryParams: {
+                    fileName: fileName
+                }
+            });
+            const cachedPath = await imageCache.cacheImage(fileName, base64);
+            return cachedPath;
+        } catch (error) {
+            console.error('Error downloading image:', error);
+            throw error;
+        }
     }
 }
