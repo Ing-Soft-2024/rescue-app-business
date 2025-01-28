@@ -162,9 +162,12 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
         backgroundColor: 'white',
+        position: 'relative',
     },
     unread: {
-        backgroundColor: '#f7f7f7',
+        backgroundColor: '#f0f7ff',
+        borderLeftWidth: 4,
+        borderLeftColor: '#2196F3',
     },
     title: {
         fontSize: 16,
