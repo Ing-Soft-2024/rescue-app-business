@@ -89,21 +89,16 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
                 }
             });
             
-            // Log the state of the last order if there are any orders
-            if (orders && orders.length > 0) {
-                const lastOrder = orders[0]; // Assuming orders are sorted with newest first
-                console.log('Last order status:', {
-                    orderId: lastOrder.id,
-                    status: lastOrder.status,
-                    createdAt: lastOrder.createdAt
-                });
-            }
-
-            // Load saved read status before processing new orders
+            // Load saved read status and previous order statuses
             const savedStatus = await SecureStore.getItemAsync(
                 `notifications_read_status_${business.id}`
             );
+            const savedPrevStatus = await SecureStore.getItemAsync(
+                `notifications_prev_status_${business.id}`
+            );
+            
             const readStatus = savedStatus ? JSON.parse(savedStatus) : {};
+            const prevOrderStatuses = savedPrevStatus ? JSON.parse(savedPrevStatus) : {};
 
             const pendingOrders = orders
                 .filter((order: any) => [
@@ -111,19 +106,41 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
                     'accepted',
                     'completed_cash',
                     'completed_mercadopago',
-                    'scanned'
+                    'scanned',
+                    'cancelled'
                 ].includes(order.status))
-                .map((order: any) => ({
-                    id: order.id,
-                    status: order.status,
-                    createdAt: order.createdAt,
-                    totalPrice: order.totalPrice,
-                    business: order.business,
-                    order_items: order.order_items || [],
-                    isRead: readStatus[order.id] || false
-                }));
+                .map((order: any) => {
+                    const previousStatus = prevOrderStatuses[order.id];
+                    const statusChanged = previousStatus && previousStatus !== order.status;
+                    
+                    // Mark as unread only if status changed to one of these states
+                    const shouldBeUnread = statusChanged && [
+                        'cancelled',
+                        'completed_cash',
+                        'completed_mercadopago'
+                    ].includes(order.status);
 
-            setNotifications(pendingOrders); // Replace instead of merge
+                    // Update previous status for this order
+                    prevOrderStatuses[order.id] = order.status;
+
+                    return {
+                        id: order.id,
+                        status: order.status,
+                        createdAt: order.createdAt,
+                        totalPrice: order.totalPrice,
+                        business: order.business,
+                        order_items: order.order_items || [],
+                        isRead: shouldBeUnread ? false : (readStatus[order.id] || false)
+                    };
+                });
+
+            // Save updated previous statuses
+            await SecureStore.setItemAsync(
+                `notifications_prev_status_${business.id}`,
+                JSON.stringify(prevOrderStatuses)
+            );
+
+            setNotifications(pendingOrders);
         } catch (error) {
             console.error('Error fetching orders:', error);
         }
