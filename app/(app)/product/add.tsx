@@ -15,6 +15,7 @@ import {
 import { useBusiness } from "@/src/context/business.context";
 import StorageController from "@/src/services/storage/controller/storage.controller";
 import { checkInternetConnection, NO_INTERNET_MESSAGE } from '@/src/utils/networkUtils';
+import { BackHandler } from "react-native";
 
 const CATEGORIES = [
     { id: 1, name: 'Comida' },
@@ -87,6 +88,15 @@ export default function ProductPage() {
         return true;
     };
 
+    const navigateToHome = () => {
+        router.push("/");
+        router.setParams({ refresh: Date.now().toString() });
+        // Clear navigation history after a short delay
+        setTimeout(() => {
+            router.replace("/");
+        }, 100);
+    };
+
     // Save product
     const handleSave = async () => {
         if (!validateProduct()) return;
@@ -119,7 +129,7 @@ export default function ProductPage() {
                 Alert.alert("Éxito", "Producto guardado", [
                     { 
                         text: "OK", 
-                        onPress: () => router.push("/(app)")
+                        onPress: navigateToHome
                     }
                 ]);
             }
@@ -133,6 +143,16 @@ export default function ProductPage() {
             setIsLoading(false);
         }
     };
+
+    // Update back button handler
+    React.useEffect(() => {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            navigateToHome();
+            return true;
+        });
+
+        return () => backHandler.remove();
+    }, []);
 
     return (
         <>
@@ -215,7 +235,7 @@ export default function ProductPage() {
 
                     <Pressable
                         style={[styles.button, styles.cancelButton]}
-                        onPress={() => router.back()}
+                        onPress={navigateToHome}
                     >
                         <Text style={styles.buttonText}>Cancelar</Text>
                     </Pressable>

@@ -1,4 +1,5 @@
 import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
+import { Camera } from "expo-camera";
 import { CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
@@ -7,13 +8,16 @@ import { ActivityIndicator, Image, Pressable, StyleSheet, Text, TouchableOpacity
 import { GalleryPicker } from "./components/galleryPicker";
 
 export default function AddProduct() {
-    const [status, requestPermision] = ImagePicker.useCameraPermissions();
+    const [hasPermission, setHasPermission] = React.useState<boolean | null>(null);
     const [image, setImages] = React.useState<string>();
     const cameraRef = React.useRef<CameraView>(null);
     const [isLoading, setIsLoading] = React.useState(false);
 
     React.useEffect(() => {
-        requestPermision();
+        (async () => {
+            const { status } = await Camera.requestCameraPermissionsAsync();
+            setHasPermission(status === 'granted');
+        })();
     }, []);
 
     React.useEffect(() => {
@@ -30,7 +34,6 @@ export default function AddProduct() {
             const result = await takePhoto();
             if (result) {
                 setImages(result.uri);
-                // Unmount camera before navigation
                 if (cameraRef.current) {
                     await cameraRef.current.pausePreview();
                 }
@@ -60,177 +63,171 @@ export default function AddProduct() {
     }
 
     return (
-        <View
-            style={styles.container}
-        >
-            <View style={{
-                position: 'absolute',
-                top: 70,
-                left: 20,
-                zIndex: 10,
-            }}>
-                <Pressable
-                    style={({ pressed }) => ({
-                        backgroundColor: pressed ? '#3333' : '#0003',
-                        padding: 10,
-                        borderRadius: 5,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 5,
-                        flexDirection: 'row',
-                    })}
-                    onPress={() => router.back()}
-                >
-                    <AntDesign name="arrowleft" size={24} color="white" />
-                    <Text style={{ color: "white" }}>Volver</Text>
-                </Pressable>
-            </View>
-
-            {
-                !status && (
-                    <View>
-                        <Text
-                            style={{
-                                color: 'white',
-                                fontWeight: 'semibold',
-                                fontSize: 16,
-                                marginBottom: 10,
-                            }}
-                        >No tienes permiso para usar la cámara</Text>
-                        <Pressable
-                            style={({ pressed }) => ({
-                                backgroundColor: pressed ? '#fafafa' : '#fefefe',
-                                padding: 14,
-                                borderRadius: 5,
-                                alignItems: "center"
-                            })}
-
-                            onPress={() => requestPermision()}
-                        >
-                            <Text>Habilitar</Text>
-                        </Pressable>
-                    </View>
-                )
-            }
-
-            <CameraView
-                style={{
-                    flex: 1,
-                    width: "100%",
-                    backgroundColor: '',
-                    overflow: 'hidden',
-                }}
-                shouldRasterizeIOS={true}
-                onCameraReady={() => {
-                    console.log("Camera ready");
-                }}
-                ref={cameraRef}
-            />
-
-            <TouchableOpacity
-                style={{
-                    position: "absolute",
-                    bottom: 120,
-                    width: 85,
-                    height: 85,
-                    backgroundColor: "#444",
-                    padding: 10,
-                    borderRadius: 100,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 5,
-                    flexDirection: "row",
-                }}
-                onPress={wrapTakePhoto}
-            >
-                <View style={{
-                    backgroundColor: "#ccc",
-                    width: 55,
-                    height: 55,
-                    borderRadius: 100,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 5,
-                    flexDirection: "row",
-                }}></View>
-            </TouchableOpacity>
-
-            <View style={{
-                position: 'absolute',
-                bottom: 20,
-                padding: 20,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                left: 0,
-                right: 0,
-                alignItems: 'center',
-            }}>
-                <GalleryPicker onSelect={setImages} />
-
-                {
-                    image && (
+        <View style={styles.container}>
+            {hasPermission === null ? (
+                <View style={styles.permissionContainer}>
+                    <Text style={styles.permissionText}>Solicitando permiso de cámara...</Text>
+                </View>
+            ) : !hasPermission ? (
+                <View style={styles.permissionContainer}>
+                    <Text style={styles.permissionText}>No tienes permiso para usar la cámara</Text>
+                    <Pressable
+                        style={({ pressed }) => ({
+                            backgroundColor: pressed ? '#fafafa' : '#fefefe',
+                            padding: 14,
+                            borderRadius: 5,
+                            alignItems: "center"
+                        })}
+                        onPress={() => Camera.requestCameraPermissionsAsync()}
+                    >
+                        <Text>Habilitar</Text>
+                    </Pressable>
+                </View>
+            ) : (
+                <>
+                    <View style={{
+                        position: 'absolute',
+                        top: 70,
+                        left: 20,
+                        zIndex: 10,
+                    }}>
                         <Pressable
                             style={({ pressed }) => ({
                                 backgroundColor: pressed ? '#3333' : '#0003',
                                 padding: 10,
                                 borderRadius: 5,
-                                overflow: 'hidden',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: 5,
                                 flexDirection: 'row',
-                                width: 60,
-                                height: 60,
                             })}
-                            onPress={() => setImages(undefined)}
+                            onPress={() => router.back()}
                         >
-                            <Image source={{ uri: image }} style={StyleSheet.absoluteFillObject} />
-                            <Pressable style={(pressed) => ({
-                                ...StyleSheet.absoluteFillObject,
-                                backgroundColor: 'black',
-                                opacity: pressed ? 0.5 : 0,
-                            })} />
-                            <FontAwesome6 name="trash" size={20} color="white" />
+                            <AntDesign name="arrowleft" size={24} color="white" />
+                            <Text style={{ color: "white" }}>Volver</Text>
                         </Pressable>
-                    )
-                }
+                    </View>
 
-                <View>
-                    <Pressable style={({ pressed }) => ({
-                        backgroundColor: pressed ? '#fafafa' : '#fefefe',
-                        padding: 10,
-                        borderRadius: 100,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 5,
-                        flexDirection: 'row',
-                        opacity: image ? 1 : 0.25,
-                    })}
+                    <CameraView
+                        style={{
+                            flex: 1,
+                            width: "100%",
+                            backgroundColor: '',
+                            overflow: 'hidden',
+                        }}
+                        shouldRasterizeIOS={true}
+                        onCameraReady={() => {
+                            console.log("Camera ready");
+                        }}
+                        ref={cameraRef}
+                    />
+
+                    <TouchableOpacity
+                        style={{
+                            position: "absolute",
+                            bottom: 120,
+                            width: 85,
+                            height: 85,
+                            backgroundColor: "#444",
+                            padding: 10,
+                            borderRadius: 100,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 5,
+                            flexDirection: "row",
+                        }}
                         onPress={wrapTakePhoto}
                     >
-                        <AntDesign
-                            name="arrowright"
-                            size={24}
-                            color="black"
+                        <View style={{
+                            backgroundColor: "#ccc",
+                            width: 55,
+                            height: 55,
+                            borderRadius: 100,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 5,
+                            flexDirection: "row",
+                        }}></View>
+                    </TouchableOpacity>
+
+                    <View style={{
+                        position: 'absolute',
+                        bottom: 20,
+                        padding: 20,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        left: 0,
+                        right: 0,
+                        alignItems: 'center',
+                    }}>
+                        <GalleryPicker onSelect={setImages} />
+
+                        {
+                            image && (
+                                <Pressable
+                                    style={({ pressed }) => ({
+                                        backgroundColor: pressed ? '#3333' : '#0003',
+                                        padding: 10,
+                                        borderRadius: 5,
+                                        overflow: 'hidden',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: 5,
+                                        flexDirection: 'row',
+                                        width: 60,
+                                        height: 60,
+                                    })}
+                                    onPress={() => setImages(undefined)}
+                                >
+                                    <Image source={{ uri: image }} style={StyleSheet.absoluteFillObject} />
+                                    <Pressable style={(pressed) => ({
+                                        ...StyleSheet.absoluteFillObject,
+                                        backgroundColor: 'black',
+                                        opacity: pressed ? 0.5 : 0,
+                                    })} />
+                                    <FontAwesome6 name="trash" size={20} color="white" />
+                                </Pressable>
+                            )
+                        }
+
+                        <View>
+                            <Pressable style={({ pressed }) => ({
+                                backgroundColor: pressed ? '#fafafa' : '#fefefe',
+                                padding: 10,
+                                borderRadius: 100,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 5,
+                                flexDirection: 'row',
+                                opacity: image ? 1 : 0.25,
+                            })}
+                                onPress={wrapTakePhoto}
+                            >
+                                <AntDesign
+                                    name="arrowright"
+                                    size={24}
+                                    color="black"
+                                />
+                            </Pressable>
+                        </View>
+
+                        {
+                        isLoading && (
+                        <ActivityIndicator 
+                            style={{
+                                position: "absolute",
+                                top: 50,
+                                left: 50,
+                                zIndex: 10,
+                            }}
+
+                            size={"large"}
                         />
-                    </Pressable>
-                </View>
-
-                {
-                isLoading && (
-                <ActivityIndicator 
-                    style={{
-                        position: "absolute",
-                        top: 50,
-                        left: 50,
-                        zIndex: 10,
-                    }}
-
-                    size={"large"}
-                />
-                )
-            }
-            </View>
+                        )
+                    }
+                    </View>
+                </>
+            )}
         </View>
     );
 }
@@ -242,4 +239,16 @@ const styles = StyleSheet.create({
         "alignItems": 'center',
         "backgroundColor": '#121212',
     },
+    permissionContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#121212',
+    },
+    permissionText: {
+        color: 'white',
+        fontWeight: '600',
+        fontSize: 16,
+        marginBottom: 10,
+    }
 });

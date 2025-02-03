@@ -19,11 +19,12 @@ export default function EditProductPage() {
     const params = useLocalSearchParams();
     const { business } = useBusiness();
     const [isLoading, setIsLoading] = React.useState(false);
+    const [isInitialLoading, setIsInitialLoading] = React.useState(true);
 
     // Add back button handler for Android
     React.useEffect(() => {
         const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            router.push("/");
+            navigateToHome();
             return true;
         });
 
@@ -41,6 +42,13 @@ export default function EditProductPage() {
         businessId: business?.id,
         createdAt: new Date()
     });
+
+    React.useEffect(() => {
+        // Simulate data loading/initialization
+        setTimeout(() => {
+            setIsInitialLoading(false);
+        }, 500);
+    }, []);
 
     // Basic validation
     const validateProduct = () => {
@@ -63,6 +71,15 @@ export default function EditProductPage() {
         return true;
     };
 
+    const navigateToHome = () => {
+        router.push("/");
+        router.setParams({ refresh: Date.now().toString() });
+        // Clear navigation history after a short delay
+        setTimeout(() => {
+            router.replace("/");
+        }, 100);
+    };
+
     // Save product
     const handleSave = async () => {
         if (!validateProduct()) return;
@@ -77,12 +94,7 @@ export default function EditProductPage() {
             Alert.alert("Éxito", "Producto actualizado", [
                 { 
                     text: "OK", 
-                    onPress: () => {
-                        router.push("/");
-                        setTimeout(() => {
-                            router.setParams({ refresh: Date.now().toString() });
-                        }, 100);
-                    }
+                    onPress: navigateToHome
                 }
             ]);
         } catch (error) {
@@ -95,65 +107,88 @@ export default function EditProductPage() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Nombre del producto</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Nombre"
-                value={product.name}
-                onChangeText={text => setProduct(prev => ({ ...prev, name: text }))}
-            />
+            {(isLoading || isInitialLoading) && (
+                <ActivityIndicator 
+                    style={{
+                        position: "absolute",
+                        top: '50%',
+                        left: '50%',
+                        transform: [{ translateX: -15 }, { translateY: -15 }],
+                        zIndex: 10,
+                    }}
+                    size={"large"}
+                    color="#D4685E"
+                />
+            )}
 
-            <Text style={styles.label}>Descripción</Text>
-            <TextInput
-                style={[styles.input, styles.multilineInput]}
-                placeholder="Descripción"
-                value={product.description}
-                onChangeText={text => setProduct(prev => ({ ...prev, description: text }))}
-                multiline
-            />
+            <View style={{ 
+                opacity: isInitialLoading ? 0.5 : 1,
+                pointerEvents: isInitialLoading ? 'none' : 'auto'
+            }}>
+                <Text style={styles.label}>Nombre del producto</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Nombre"
+                    value={product.name}
+                    onChangeText={text => setProduct(prev => ({ ...prev, name: text }))}
+                    editable={!isInitialLoading}
+                />
 
-            <Text style={styles.label}>Precio</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Precio"
-                value={String(product.price)}
-                onChangeText={text => {
-                    const number = parseFloat(text);
-                    setProduct(prev => ({ ...prev, price: isNaN(number) ? 0 : number }));
-                }}
-                keyboardType="numeric"
-            />
+                <Text style={styles.label}>Descripción</Text>
+                <TextInput
+                    style={[styles.input, styles.multilineInput]}
+                    placeholder="Descripción"
+                    value={product.description}
+                    onChangeText={text => setProduct(prev => ({ ...prev, description: text }))}
+                    multiline
+                    editable={!isInitialLoading}
+                />
 
-            <Text style={styles.label}>Stock disponible</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Stock"
-                value={String(product.stock)}
-                onChangeText={text => {
-                    const number = parseInt(text);
-                    setProduct(prev => ({ ...prev, stock: isNaN(number) ? 0 : number }));
-                }}
-                keyboardType="numeric"
-            />
+                <Text style={styles.label}>Precio</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Precio"
+                    value={String(product.price)}
+                    onChangeText={text => {
+                        const number = parseFloat(text);
+                        setProduct(prev => ({ ...prev, price: isNaN(number) ? 0 : number }));
+                    }}
+                    keyboardType="numeric"
+                    editable={!isInitialLoading}
+                />
 
-            <Pressable
-                style={styles.button}
-                onPress={handleSave}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <ActivityIndicator color="white" />
-                ) : (
-                    <Text style={styles.buttonText}>Guardar</Text>
-                )}
-            </Pressable>
+                <Text style={styles.label}>Stock disponible</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Stock"
+                    value={String(product.stock)}
+                    onChangeText={text => {
+                        const number = parseInt(text);
+                        setProduct(prev => ({ ...prev, stock: isNaN(number) ? 0 : number }));
+                    }}
+                    keyboardType="numeric"
+                    editable={!isInitialLoading}
+                />
 
-            <Pressable
-                style={[styles.button, styles.cancelButton]}
-                onPress={() => router.push("/")}
-            >
-                <Text style={styles.buttonText}>Cancelar</Text>
-            </Pressable>
+                <Pressable
+                    style={styles.button}
+                    onPress={handleSave}
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <ActivityIndicator color="white" />
+                    ) : (
+                        <Text style={styles.buttonText}>Guardar</Text>
+                    )}
+                </Pressable>
+
+                <Pressable
+                    style={[styles.button, styles.cancelButton]}
+                    onPress={navigateToHome}
+                >
+                    <Text style={styles.buttonText}>Cancelar</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }
