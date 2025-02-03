@@ -12,12 +12,23 @@ import {
     StyleSheet,
 } from "react-native";
 import { useBusiness } from "@/src/context/business.context";
+import { BackHandler } from "react-native";
 
 export default function EditProductPage() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { business } = useBusiness();
     const [isLoading, setIsLoading] = React.useState(false);
+
+    // Add back button handler for Android
+    React.useEffect(() => {
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            router.push("/");
+            return true;
+        });
+
+        return () => backHandler.remove();
+    }, []);
 
     // Initialize product state from params
     const [product, setProduct] = React.useState<ProductType>({
@@ -67,7 +78,7 @@ export default function EditProductPage() {
                 { 
                     text: "OK", 
                     onPress: () => {
-                        router.back();
+                        router.push("/");
                         setTimeout(() => {
                             router.setParams({ refresh: Date.now().toString() });
                         }, 100);
@@ -139,7 +150,7 @@ export default function EditProductPage() {
 
             <Pressable
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => router.back()}
+                onPress={() => router.push("/")}
             >
                 <Text style={styles.buttonText}>Cancelar</Text>
             </Pressable>
