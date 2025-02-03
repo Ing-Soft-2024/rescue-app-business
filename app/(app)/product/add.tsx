@@ -31,11 +31,20 @@ export default function ProductPage() {
     const params = useLocalSearchParams();
     const { business } = useBusiness();
     const [isLoading, setIsLoading] = React.useState(false);
+    const [isScreenLoading, setIsScreenLoading] = React.useState(true);
     const [selectedCategory, setSelectedCategory] = React.useState<number | null>(null);
 
     // Get image from params
     const image = params.imageUri as string;
     const imageBase64 = params.imageBase64 as string;
+
+    React.useEffect(() => {
+        // Simulate waiting for permissions/initialization
+        const timer = setTimeout(() => {
+            setIsScreenLoading(false);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Basic product state
     const [product, setProduct] = React.useState<ProductType>({
@@ -126,84 +135,93 @@ export default function ProductPage() {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <TextInput
-                style={styles.input}
-                placeholder="Nombre"
-                value={product.name}
-                onChangeText={text => setProduct(prev => ({ ...prev, name: text }))}
-            />
+        <>
+            {isScreenLoading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#D4685E" />
+                    <Text style={styles.loadingText}>Cargando...</Text>
+                </View>
+            ) : (
+                <ScrollView style={styles.container}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Nombre"
+                        value={product.name}
+                        onChangeText={text => setProduct(prev => ({ ...prev, name: text }))}
+                    />
 
-            <TextInput
-                style={styles.input}
-                placeholder="Descripción"
-                value={product.description}
-                onChangeText={text => setProduct(prev => ({ ...prev, description: text }))}
-                multiline
-            />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Descripción"
+                        value={product.description}
+                        onChangeText={text => setProduct(prev => ({ ...prev, description: text }))}
+                        multiline
+                    />
 
-            <TextInput
-                style={styles.input}
-                placeholder="Precio"
-                value={product.price > 0 ? String(product.price) : ''}
-                onChangeText={text => {
-                    const number = parseFloat(text);
-                    setProduct(prev => ({ ...prev, price: isNaN(number) ? 0 : number }));
-                }}
-                keyboardType="numeric"
-            />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Precio"
+                        value={product.price > 0 ? String(product.price) : ''}
+                        onChangeText={text => {
+                            const number = parseFloat(text);
+                            setProduct(prev => ({ ...prev, price: isNaN(number) ? 0 : number }));
+                        }}
+                        keyboardType="numeric"
+                    />
 
-            <TextInput
-                style={styles.input}
-                placeholder="Stock"
-                value={product.stock > 0 ? String(product.stock) : ''}
-                onChangeText={text => {
-                    const number = parseInt(text);
-                    setProduct(prev => ({ ...prev, stock: isNaN(number) ? 0 : number }));
-                }}
-                keyboardType="numeric"
-            />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Stock"
+                        value={product.stock > 0 ? String(product.stock) : ''}
+                        onChangeText={text => {
+                            const number = parseInt(text);
+                            setProduct(prev => ({ ...prev, stock: isNaN(number) ? 0 : number }));
+                        }}
+                        keyboardType="numeric"
+                    />
 
-            <Text style={styles.categoryLabel}>Categoría:</Text>
-            <View style={styles.categoryContainer}>
-                {CATEGORIES.map((category) => (
+                    <Text style={styles.categoryLabel}>Categoría:</Text>
+                    <View style={styles.categoryContainer}>
+                        {CATEGORIES.map((category) => (
+                            <Pressable
+                                key={category.id}
+                                style={[
+                                    styles.categoryButton,
+                                    selectedCategory === category.id && styles.categoryButtonSelected
+                                ]}
+                                onPress={() => setSelectedCategory(category.id)}
+                            >
+                                <Text style={[
+                                    styles.categoryButtonText,
+                                    selectedCategory === category.id && styles.categoryButtonTextSelected
+                                ]}>
+                                    {category.name}
+                                </Text>
+                            </Pressable>
+                        ))}
+                    </View>
+
                     <Pressable
-                        key={category.id}
-                        style={[
-                            styles.categoryButton,
-                            selectedCategory === category.id && styles.categoryButtonSelected
-                        ]}
-                        onPress={() => setSelectedCategory(category.id)}
+                        style={styles.button}
+                        onPress={handleSave}
+                        disabled={isLoading}
                     >
-                        <Text style={[
-                            styles.categoryButtonText,
-                            selectedCategory === category.id && styles.categoryButtonTextSelected
-                        ]}>
-                            {category.name}
-                        </Text>
+                        {isLoading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text style={styles.buttonText}>Guardar</Text>
+                        )}
                     </Pressable>
-                ))}
-            </View>
 
-            <Pressable
-                style={styles.button}
-                onPress={handleSave}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <ActivityIndicator color="white" />
-                ) : (
-                    <Text style={styles.buttonText}>Guardar</Text>
-                )}
-            </Pressable>
-
-            <Pressable
-                style={[styles.button, styles.cancelButton]}
-                onPress={() => router.back()}
-            >
-                <Text style={styles.buttonText}>Cancelar</Text>
-            </Pressable>
-        </ScrollView>
+                    <Pressable
+                        style={[styles.button, styles.cancelButton]}
+                        onPress={() => router.back()}
+                    >
+                        <Text style={styles.buttonText}>Cancelar</Text>
+                    </Pressable>
+                </ScrollView>
+            )}
+        </>
     );
 }
 
@@ -263,5 +281,16 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontSize: 16,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#666',
     },
 });
