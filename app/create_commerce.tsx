@@ -24,17 +24,6 @@ const COUNTRIES = {
     'Salta',
     // Add more cities as needed
   ],
-  'United States': [
-    'New York',
-    'Los Angeles',
-    'Chicago',
-    'Houston',
-    'Phoenix',
-    'Philadelphia',
-    'San Antonio',
-    'San Diego',
-    // Add more cities as needed
-  ]
 };
 
 type AddressSuggestion = {
