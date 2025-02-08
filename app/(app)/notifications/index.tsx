@@ -122,13 +122,13 @@ export default function NotificationsScreen() {
                             </View>
                         </View>
 
-                        {item.order_items && item.order_items.map((product, index) => (
+                        {item.order_items && item.order_items.map((orderItem, index) => (
                             <View key={index} style={styles.productItem}>
                                 <Text style={styles.productName}>
-                                    {product.quantity}x {product.name}
+                                    {orderItem.quantity}x {orderItem.product.name}
                                 </Text>
                                 <Text style={styles.productPrice}>
-                                    {formatCurrency(product.price * product.quantity)}
+                                    {formatCurrency(orderItem.price * orderItem.quantity)}
                                 </Text>
                             </View>
                         ))}
