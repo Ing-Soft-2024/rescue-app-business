@@ -26,7 +26,7 @@
     "country-state-city": "^3.2.1",
     "expo": "~51.0.39",
     "expo-apple-authentication": "~6.4.2",
-    "expo-barcode-scanner": "~13.0.1",
+    "expo-barcode-scanner": "~12.7.0",
     "expo-camera": "~15.0.16",
     "expo-constants": "~16.0.2",
     "expo-crypto": "~13.0.2",
